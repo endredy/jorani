@@ -47,7 +47,7 @@ class Leaves_model extends CI_Model {
      * @return array list of records
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function getLeavesOfEmployee($employee) {
+    public function getLeavesOfEmployee($employee, $leave_type_id = NULL, $startdate = NULL, $enddate = NULL) {
         $this->db->select('leaves.*');
         $this->db->select('status.id as status, status.name as status_name');
         $this->db->select('types.name as type_name');
@@ -55,6 +55,17 @@ class Leaves_model extends CI_Model {
         $this->db->join('status', 'leaves.status = status.id');
         $this->db->join('types', 'leaves.type = types.id');
         $this->db->where('leaves.employee', $employee);
+        if ($leave_type_id != NULL){
+            $this->db->where('types.id', $leave_type_id);
+        }
+        if ($startdate != NULL){
+//            echo 'HALI' . $startdate;
+            $this->db->where('leaves.startdate >  STR_TO_DATE(\'' . $startdate . '\', \'%Y-%m-%d\')');
+        }
+        if ($enddate != NULL){
+//            echo 'HALI' . $startdate;
+            $this->db->where('leaves.enddate <  STR_TO_DATE(\'' . $enddate . '\', \'%Y-%m-%d\')');
+        }
         $this->db->order_by('leaves.id', 'desc');
         return $this->db->get()->result_array();
     }
@@ -251,7 +262,8 @@ class Leaves_model extends CI_Model {
         $this->db->join('types', 'types.id = entitleddays.type');
         $this->db->group_by('types.id');
         $this->db->where('entitleddays.startdate <= ', $refDate);
-        $this->db->where('entitleddays.enddate >= ', $refDate);
+        if ($this->config->item('strictDate'))
+            $this->db->where('entitleddays.enddate >= ', $refDate);
         $where = ' (entitleddays.contract=' . $contract .
                        ' OR entitleddays.employee=' . $employee . ')';
         $this->db->where($where, NULL, FALSE);   //Not very safe, but can't do otherwise
@@ -263,6 +275,190 @@ class Leaves_model extends CI_Model {
         }
         return $entitled_days;
     }
+
+    /**
+     * is this leave type is not limited (home office, sick home office, sick leaves, etc)
+     * @param string $type leave type name
+     * @return boolean this type is unlimited (true) or not (false)
+     * @author esteve
+     */
+    public function isOutOfficeLeaveType($type){
+
+        $this->db->select('id');
+        $this->db->from('types');
+        $this->db->where('name', $type);
+        $this->db->where('nodeduction', 1);
+        $r = $this->db->get()->result_array();
+        return count($r) > 0;
+//        $this->db->select('COUNT(types.id) as c');
+//        $this->db->from('types');
+//        $this->db->join('parameters', 'parameters.entity_id = types.id', 'INNER');
+//        if ($type) {
+//            $this->db->where('types.name', $type);
+//        }
+//        $this->db->where('parameters.name', 'type_outoffice');
+//        $this->db->where('parameters.value', '1');
+//        $exists = $this->db->get()->row_array();
+////        var_dump($exists);
+//        return $exists['c'] > 0;
+    }
+
+    /**
+     * get users' available day(s) in this leave type (e.g. home office is limited in 2 days a week, etc)
+     * @param int $id ID of the employee
+     * @param string $type leave type name
+     * @return int available day(s) (credit in some ui) or NULL if it is not limited
+     * @author esteve
+     */
+    public function getUserAvailableDays($id, $type, $startdate = NULL){
+
+        $this->db->select('id, limit');
+        $this->db->from('types');
+//        $this->db->join('parameters', 'parameters.entity_id = types.id', 'INNER');
+        if ($type) {
+            $this->db->where('name', $type);
+        }
+//        $this->db->where('parameters.name', 'type_limit');
+
+        $r = $this->db->get()->row_array();
+//        var_dump($r);
+        if (!$r)
+            return NULL; // we are ready, this type has no weekly limit
+
+//        csak akkor validalna, ha van kezdodatum. Jobb lenne az request gomb utan validalni, akkor biztos van datum.
+
+        // has this user custom weekly limit?
+        $this->load->model('users_model');
+        $user = $this->users_model->getUsers($id);
+        if (isset($user['home_office_limit']) && $user['home_office_limit'] != '')
+            $r['limit'] = $user['home_office_limit'];
+
+        if ($startdate == NULL || new DateTime($startdate) < new DateTime() || !$r) {
+            return $r ? $r['limit'] : NULL;
+        }
+
+        // we check that week, if this
+        $day = date('w');
+        $weekStart = date('Y-m-d', strtotime('-'.$day.' days'));
+        $weekEnd = date('Y-m-d', strtotime('+'.(6-$day).' days'));
+        $l = $this->getLeavesOfEmployee($id, $r['id'], $weekStart, $weekEnd);
+//        ha mar ebbol a tipusbol vett ki a heten, az csokkenti!
+        $taken = 0;
+        foreach ($l as $row){
+            $taken += floatval($row['duration']);
+        }
+//        var_dump($startdate);
+        $available = floatval($r['limit']) - $taken;
+        return $available > 0 ? $available : 0;
+    }
+
+    /**
+     * is this leave type is not limited (home office, sick home office, sick leaves, etc)
+     * @param string $type leave type name
+     * @return boolean this type is unlimited (true) or not (false)
+     * @author esteve
+     */
+    public function getLeaveTypeLimits($type = NULL){
+
+        $this->db->select('id, limit');
+        $this->db->from('types');
+//        $this->db->join('parameters', 'parameters.entity_id = types.id', 'INNER');
+//        $this->db->where('parameters.name', "type_outoffice");
+        if ($type) {
+            $this->db->where('name', $type);
+        }
+        $r = $this->db->get()->result_array();
+        $limits = array();
+        foreach ($r as $result) {
+            $limits[$result['id']] = $result['limit'];
+        }
+        return $limits;
+    }
+
+    /**
+     * is this leave type is not limited (home office, sick home office, sick leaves, etc)
+     * @param string $type leave type name
+     * @return boolean this type is unlimited (true) or not (false)
+     * @author esteve
+     */
+    public function isLeaveTypeWithoutApproval($id){
+
+        $this->db->select('id');
+        $this->db->from('types');
+        $this->db->where('id', $id);
+        $this->db->where('noapproval', 1);
+        $r = $this->db->get()->result_array();
+        return count($r) > 0;
+    }
+
+    /**
+     * get the colors of different leave types (home office, sick home office, sick leaves, etc)
+     * @return array of leave type colors
+     * @author esteve
+     */
+    public function getLeaveTypeColors(){
+
+        $this->db->select('id, name, color, textcolor');
+        $this->db->from('types');
+        if ($this->config->item('hideZeroLeaveType')){
+            $this->db->where('id != 0');
+        }
+//        $this->db->join('parameters', 'parameters.entity_id = types.id', 'INNER');
+//        $this->db->where('parameters.name', 'type_color');
+        return $this->db->get()->result_array();
+    }
+
+    private function getStateCaption($state){
+        switch ($state){
+            case LMS_PLANNED : return lang('Planned');
+            case LMS_REQUESTED : return lang('Requested');
+            case LMS_ACCEPTED : return lang('Accepted');
+            case LMS_REJECTED : return lang('Rejected');
+            case LMS_CANCELLATION : return lang('Cancellation');
+            case LMS_CANCELED : return lang('Canceled');
+        }
+        return '';
+    }
+    public function getStateCaptions(){
+        /*        <option value="1" <?php if ($leave['status'] == LMS_PLANNED) echo 'selected'; ?>><?php echo lang('Planned');?></option>
+        <option value="2" <?php if (($leave['status'] == LMS_REQUESTED) || $this->config->item('leave_status_requested')) echo 'selected'; ?>><?php echo lang('Requested');?></option>
+        <option value="3" <?php if ($leave['status'] == LMS_ACCEPTED) echo 'selected'; ?>><?php echo lang('Accepted');?></option>
+        <option value="4" <?php if ($leave['status'] == LMS_REJECTED) echo 'selected'; ?>><?php echo lang('Rejected');?></option>
+        <option value="5" <?php if ($leave['status'] == LMS_CANCELLATION) echo 'selected'; ?>><?php echo lang('Cancellation');?></option>
+        <option value="6" <?php if ($leave['status'] == LMS_CANCELED) echo 'selected'; ?>><?php echo lang('Canceled');?></option>
+*/
+        return [LMS_PLANNED => lang('Planned'),
+            LMS_REQUESTED => lang('Requested'),
+            LMS_ACCEPTED => lang('Accepted'),
+            LMS_REJECTED => lang('Rejected'),
+            LMS_CANCELLATION => lang('Cancellation'),
+            LMS_CANCELED => lang('Canceled')
+        ];
+    }
+
+    private function getStateClass($state){
+        switch ($state){
+            case LMS_PLANNED : return "allplanned";
+            case LMS_REQUESTED : return "allrequested";
+            case LMS_ACCEPTED : return "allaccepted";
+            case LMS_REJECTED :
+            case LMS_CANCELLATION :
+            case LMS_CANCELED : return "allrejected";
+        }
+        return '';
+    }
+    /**
+    esteve
+    */
+    public function getLeaveTypeStyle(){
+        $r = '<style>';
+        foreach($this->getLeaveTypeColors() as $i){
+            $r .= '.leave' . $i['id'] . ' {background-color: '.($i['color'] ? $i['color'] : 'white').'!important; color:'.($i['textcolor'] ? $i['textcolor'] : 'black').';}';
+        }
+        $r .= '</style>';
+        return $r;
+    }
+
 
     /**
      * Compute the leave balance of an employee (used by report and counters)
@@ -296,6 +492,19 @@ class Leaves_model extends CI_Model {
             //Get the sum of entitled days
             $user = $this->users_model->getUsers($id);
             $entitlements = $this->getSumEntitledDays($id, $user['contract'], $refDate);
+
+            foreach($types as $t){
+                if (!isset($entitlements[$t['id']])){
+                    $entitlements[$t['id']] = [
+                        'type_id' => $t['id'],
+                        'type_name' => $t['name'],
+                        'entitled' => 0,
+                        'nodeduction' => $t['nodeduction'],
+                        'min_date' => $startentdate,//$refDate,
+                        'max_date' => $endentdate//$refDate
+                    ];
+                }
+            }
 
             foreach ($entitlements as $entitlement) {
                 //Get the total of taken leaves grouped by type
@@ -392,7 +601,11 @@ class Leaves_model extends CI_Model {
         if (is_null($summary)) {
             return NULL;
         } else {
-            if (array_key_exists($type, $summary)) {
+            if ($this->isOutOfficeLeaveType($type)) { // TODO: getLeaveTypeLimits($type) kell ide esteve
+                // this leave type is an exception, it is out of days off. (home office)
+                // check it has weekly limit
+                return $this->getUserAvailableDays($id, $type, $startdate);
+            } else if (array_key_exists($type, $summary)) {
                 return ($summary[$type][1] - $summary[$type][0]);
             } else {
                 return 0;
@@ -732,7 +945,7 @@ class Leaves_model extends CI_Model {
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
     public function individual($user_id, $start = "", $end = "") {
-        $this->db->select('leaves.*, types.name as type');
+        $this->db->select('leaves.*, types.name as type, types.color, types.textcolor');
         $this->db->join('types', 'leaves.type = types.id');
         $this->db->where('employee', $user_id);
         $this->db->where('(leaves.startdate <= DATE(' . $this->db->escape($end) . ') AND leaves.enddate >= DATE(' . $this->db->escape($start) . '))');
@@ -782,7 +995,8 @@ class Leaves_model extends CI_Model {
                 'title' => $entry->type,
                 'imageurl' => $imageUrl,
                 'start' => $startdate,
-                'color' => $color,
+                'color' => $entry->color ? $entry->color : $color,  //esteve
+                'textColor' => $entry->textcolor ? $entry->textcolor : 'white',  //esteve
                 'allDay' => $allDay,
                 'end' => $enddate,
                 'startdatetype' => $startdatetype,
@@ -801,6 +1015,8 @@ class Leaves_model extends CI_Model {
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
     public function workmates($user_id, $start = "", $end = "") {
+        $this->db->select('leaves.*, users.firstname, users.lastname, types.color, types.textcolor');
+        $this->db->join('types', 'leaves.type = types.id');
         $this->db->join('users', 'users.id = leaves.employee');
         $this->db->where('users.manager', $user_id);
         $this->db->where('leaves.status < ', LMS_REJECTED);       //Exclude rejected requests
@@ -850,7 +1066,8 @@ class Leaves_model extends CI_Model {
                 'title' => $entry->firstname .' ' . $entry->lastname,
                 'imageurl' => $imageUrl,
                 'start' => $startdate,
-                'color' => $color,
+                'color' => $entry->color ? $entry->color : $color,  //esteve
+                'textColor' => $entry->textcolor ? $entry->textcolor : 'white',  //esteve
                 'allDay' => $allDay,
                 'end' => $enddate,
                 'startdatetype' => $startdatetype,
@@ -869,6 +1086,8 @@ class Leaves_model extends CI_Model {
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
     public function collaborators($user_id, $start = "", $end = "") {
+        $this->db->select('leaves.*, users.firstname, users.lastname, types.color, types.textcolor');
+        $this->db->join('types', 'leaves.type = types.id');
         $this->db->join('users', 'users.id = leaves.employee');
         $this->db->where('users.manager', $user_id);
         $this->db->where('(leaves.startdate <= DATE(' . $this->db->escape($end) . ') AND leaves.enddate >= DATE(' . $this->db->escape($start) . '))');
@@ -917,7 +1136,8 @@ class Leaves_model extends CI_Model {
                 'title' => $entry->firstname .' ' . $entry->lastname,
                 'imageurl' => $imageUrl,
                 'start' => $startdate,
-                'color' => $color,
+                'color' => $entry->color ? $entry->color : $color,  //esteve
+                'textColor' => $entry->textcolor ? $entry->textcolor : 'white',  //esteve
                 'allDay' => $allDay,
                 'end' => $enddate,
                 'startdatetype' => $startdatetype,
@@ -940,7 +1160,7 @@ class Leaves_model extends CI_Model {
     public function department($entity_id, $start = "", $end = "", $children = FALSE, $statusFilter = NULL) {
         $this->db->select('users.firstname, users.lastname, users.manager');
         $this->db->select('leaves.*');
-        $this->db->select('types.name as type, types.acronym as acronym');
+        $this->db->select('types.name as type, types.acronym as acronym, types.color, types.textcolor');
         $this->db->from('organization');
         $this->db->join('users', 'users.organization = organization.id');
         $this->db->join('leaves', 'leaves.employee = users.id');
@@ -1028,7 +1248,10 @@ class Leaves_model extends CI_Model {
                 'title' => $title,
                 'imageurl' => $imageUrl,
                 'start' => $startdate,
-                'color' => $color,
+                'color' => $entry->color ? $entry->color : $color,  //esteve
+                'textColor' => $entry->textcolor ? $entry->textcolor : 'white',  //esteve
+                'stateClass' => $this->getStateClass($entry->status), //esteve
+                'stateText' => $entry->status != LMS_ACCEPTED ? $this->getStateCaption($entry->status) : '', //esteve (accepted doesn't need icon)
                 'allDay' => $allDay,
                 'end' => $enddate,
                 'startdatetype' => $startdatetype,
@@ -1193,10 +1416,17 @@ class Leaves_model extends CI_Model {
 
         if (count($ids) > 0) {
             array_push($ids, $manager);
-            $this->db->where_in('users.manager', $ids);
+            $this->db->where_in('(users.manager', $ids);
         } else {
-            $this->db->where('users.manager', $manager);
+            $this->db->where('(users.manager', $manager);
         }
+        if ($this->config->item('approveByAdmin')) {
+            if ($this->session->userdata('is_admin') === TRUE)
+                $this->db->or_where("types.approvebyadmin = 1");
+            else
+                $this->db->where("!(types.approvebyadmin <=> 1)"); // esteve: sick leave is accepted by admin
+        }
+        $this->db->where('1=1)'); // closing and/or condition
         if ($all == FALSE) {
             $this->db->where('leaves.status', LMS_REQUESTED);
             $this->db->or_where('leaves.status', LMS_CANCELLATION);
@@ -1236,10 +1466,15 @@ class Leaves_model extends CI_Model {
       $ids = $this->delegations_model->listManagersGivingDelegation($manager);
       if (count($ids) > 0) {
         array_push($ids, $manager);
-        $query .= " WHERE users.manager IN (" . implode(",", $ids) . ")";
+        $query .= " WHERE (users.manager IN (" . implode(",", $ids) . ")";
       } else {
-        $query .= " WHERE users.manager = $manager";
+        $query .= " WHERE (users.manager = $manager";
       }
+
+      if ($this->config->item('approveByAdmin')) {
+          $query .= $this->session->userdata('is_admin') === TRUE ? " OR types.approvebyadmin = 1)" : " AND !(types.approvebyadmin <=> 1))"; // $manager == 2 esteve: sick leave is accepted by admin
+      }else
+          $query .= ")";
       if ($all == FALSE) {
         $query .= " AND (leaves.status = " . LMS_REQUESTED .
                 " OR leaves.status = " . LMS_CANCELLATION . ")";
@@ -1264,10 +1499,21 @@ class Leaves_model extends CI_Model {
 
         if (count($ids) > 0) {
             array_push($ids, $manager);
-            $this->db->where_in('users.manager', $ids);
+            $this->db->where_in('(users.manager', $ids);
         } else {
-            $this->db->where('users.manager', $manager);
+            $this->db->where('(users.manager', $manager);
         }
+
+        if ($this->config->item('approveByAdmin')) {
+            $this->db->join('types', 'leaves.type = types.id');
+            if ($this->session->userdata('is_admin') === TRUE)
+                $this->db->or_where("types.approvebyadmin = 1"); // nicer but OR kills the other conditions :(
+//                $this->db->where("(types.approvebyadmin = 1 OR users.manager = $manager)");
+            else
+                $this->db->where("COALESCE(types.approvebyadmin, 0) != 1"); // esteve: sick leave is accepted by admin null safe operator <=> doesnt work with 'where' function (so coalesce but cannot use index)  https://stackoverflow.com/questions/21927117/what-is-this-operator-in-mysql/21928508#21928508
+        }
+        $this->db->where("1=1)"); // closing and/or condition
+
         $result = $this->db->get('leaves');
         return $result->row()->number;
     }
@@ -1505,7 +1751,7 @@ class Leaves_model extends CI_Model {
         }
 
         //Build the complex query for all leaves
-        $this->db->select('leaves.*');
+        $this->db->select('leaves.*, types.id as typesid');
         $this->db->select('types.acronym, types.name as type');
         $this->db->select('users.manager as manager');
         $this->db->from('leaves');
@@ -1601,12 +1847,16 @@ class Leaves_model extends CI_Model {
                             $user->days[$dayNum]->display .= ';' . $display;
                             $user->days[$dayNum]->status .= ';' . $entry->status;
                             $user->days[$dayNum]->acronym .= ';' . $entry->acronym;
+                            $user->days[$dayNum]->leaveTypeId .= ';' . $entry->typesid; // esteve
+                            $user->days[$dayNum]->title .= ';' . $entry->type . ' ('.$this->getStateCaption($entry->status).')'; // esteve
                         } else {
                             $user->days[$dayNum]->id = $entry->id . ';' . $user->days[$dayNum]->id;
                             $user->days[$dayNum]->type = $entry->type . ';' . $user->days[$dayNum]->type;
                             $user->days[$dayNum]->display = $display . ';' . $user->days[$dayNum]->display;
                             $user->days[$dayNum]->status = $entry->status . ';' . $user->days[$dayNum]->status;
-                            $user->days[$dayNum]->acronym .= $entry->acronym . ';' . $user->days[$dayNum]->acronym;
+                            $user->days[$dayNum]->acronym = $entry->acronym . ';' . $user->days[$dayNum]->acronym;
+                            $user->days[$dayNum]->leaveTypeId = $entry->typesid . ';' . $user->days[$dayNum]->leaveTypeId; // esteve
+                            $user->days[$dayNum]->title .= ';' . $entry->type . ' ('.$this->getStateCaption($user->days[$dayNum]->status).')';
                         }
                     } else  {   //All day entry
                         $user->days[$dayNum]->id = $entry->id;
@@ -1614,6 +1864,8 @@ class Leaves_model extends CI_Model {
                         $user->days[$dayNum]->display = $display;
                         $user->days[$dayNum]->status = $entry->status;
                         $user->days[$dayNum]->acronym = $entry->acronym;
+                        $user->days[$dayNum]->leaveTypeId = $entry->typesid; // esteve
+                        $user->days[$dayNum]->title = $entry->type . ' ('.$this->getStateCaption($entry->status).')'; // esteve
                     }
                 }
                 $iDate->modify('+1 day');   //Next day
@@ -1687,8 +1939,8 @@ class Leaves_model extends CI_Model {
             ON (entitleddays.type = leaves.type AND
                 (users.id = entitleddays.employee OR contracts.id = entitleddays.contract)
                         and entitleddays.startdate <= leaves.enddate AND entitleddays.enddate >= leaves.startdate)
-        WHERE entitleddays.type IS NULL
-        ORDER BY users.id ASC, leaves.startdate DESC', FALSE);
+        WHERE entitleddays.type IS NULL AND types.nodeduction <> 1
+        ORDER BY users.id ASC, leaves.startdate DESC', FALSE); // 'AND types.nodeduction <> 1' esteve
         return $query->result_array();
     }
 

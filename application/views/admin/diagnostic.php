@@ -262,6 +262,7 @@ $overlappingLeaves_badge = ($overlappingLeaves_count == 0)?'':'<span class="badg
             <th><?php echo lang('admin_diagnostic_balance_thead_id');?></th>
             <th><?php echo lang('admin_diagnostic_balance_thead_employee');?></th>
             <th><?php echo lang('admin_diagnostic_balance_thead_contract');?></th>
+            <th><?php echo lang('admin_diagnostic_entitlements_thead_type');?></th>
             <th><?php echo lang('admin_diagnostic_balance_thead_start_date');?></th>
             <th><?php echo lang('admin_diagnostic_balance_thead_status');?></th>
         </tr>
@@ -281,6 +282,7 @@ $overlappingLeaves_badge = ($overlappingLeaves_count == 0)?'':'<span class="badg
                 <a target="_blank" href="<?php echo base_url();?>entitleddays/contract/<?php echo $balance['employee'];?>"><i class="mdi mdi-pencil-box-outline nolink"></i></a>
                 <?php echo $balance['contract_label'];?>
             </td>
+            <td><?php echo $balance['type_label'];?></td>
             <td><?php echo $startdate;?></td>
             <td><?php echo $balance['status_label'];?></td>
         </tr>

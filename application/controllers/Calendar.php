@@ -77,6 +77,7 @@ class Calendar extends CI_Controller {
         $data['year'] = $year;
         $data['title'] = lang('calendar_year_title');
         $data['help'] = $this->help->create_help_link('global_link_doc_page_calendar_yearly');
+        $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
         $this->load->view('templates/header', $data);
         $this->load->view('menu/index', $data);
         $this->load->view('calendar/year', $data);
@@ -98,6 +99,8 @@ class Calendar extends CI_Controller {
         $data['googleApi'] = FALSE;
         $data['clientId'] = 'key';
         $data['apiKey'] = 'key';
+        $this->load->model('leaves_model');
+        $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
         $this->load->view('templates/header', $data);
         $this->load->view('menu/index', $data);
         $this->load->view('calendar/individual', $data);
@@ -117,6 +120,8 @@ class Calendar extends CI_Controller {
         $data = getUserContext($this);
         $data['title'] = lang('calendar_workmates_title');
         $data['help'] = $this->help->create_help_link('global_link_doc_page_calendar_workmates');
+        $this->load->model('leaves_model');
+        $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
         $this->load->view('templates/header', $data);
         $this->load->view('menu/index', $data);
         $this->load->view('calendar/workmates', $data);
@@ -135,6 +140,8 @@ class Calendar extends CI_Controller {
         $data = getUserContext($this);
         $data['title'] = lang('calendar_collaborators_title');
         $data['help'] = $this->help->create_help_link('global_link_doc_page_calendar_collaborators');
+        $this->load->model('leaves_model');
+        $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
         $this->load->view('templates/header', $data);
         $this->load->view('menu/index', $data);
         $this->load->view('calendar/collaborators', $data);
@@ -161,6 +168,8 @@ class Calendar extends CI_Controller {
             redirect('leaves');
         } else {
             $data['department'] = $department->name;
+            $this->load->model('leaves_model');
+            $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
             $this->load->view('templates/header', $data);
             $this->load->view('menu/index', $data);
             $this->load->view('calendar/department', $data);
@@ -177,6 +186,7 @@ class Calendar extends CI_Controller {
         $month = date('m');
         //When the user uses the calendar for the first time, select the root entity
         $this->load->model('organization_model');
+        $this->load->model('leaves_model');
         if (($this->config->item('public_calendar') === TRUE) && (!$this->session->userdata('logged_in'))) {
             $this->load->library('polyglot');;
             $data['language'] = $this->config->item('language');
@@ -190,6 +200,7 @@ class Calendar extends CI_Controller {
             $dateObj = DateTime::createFromFormat('!m', $month);
             $data['monthName'] = lang($dateObj->format('F'));
             $data['departmentName'] = $this->organization_model->getName(0);
+            $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
             $this->lang->load('calendar', $data['language']);
             $this->load->view('templates/header', $data);
             $this->load->view('calendar/organization', $data);
@@ -208,6 +219,7 @@ class Calendar extends CI_Controller {
             $data['title'] = lang('calendar_organization_title');
             $data['help'] = $this->help->create_help_link('global_link_doc_page_calendar_organization');
             $data['departmentName'] = $this->organization_model->getName(0);
+            $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
             $this->load->view('templates/header', $data);
             $this->load->view('menu/index', $data);
             $this->load->view('calendar/organization', $data);
@@ -283,6 +295,9 @@ class Calendar extends CI_Controller {
             $data['department'] = $this->organization_model->getName($id);
             $data['title'] = lang('calendar_tabular_title');
             $data['help'] = '';
+            $data['leaveColors'] = $this->leaves_model->getLeaveTypeStyle(); // esteve
+            $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
+            $data['stateCaptions'] = $this->leaves_model->getStateCaptions(); // esteve
             $data['tabularPartialView'] = $this->load->view('calendar/tabular_partial', $data, TRUE);
             $this->load->view('templates/header', $data);
             $this->load->view('calendar/tabular', $data);
@@ -307,6 +322,9 @@ class Calendar extends CI_Controller {
             $data['department'] = $this->organization_model->getName($id);
             $data['title'] = lang('calendar_tabular_title');
             $data['help'] = $this->help->create_help_link('global_link_doc_page_calendar_tabular');
+            $data['leaveColors'] = $this->leaves_model->getLeaveTypeStyle();
+            $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
+            $data['stateCaptions'] = $this->leaves_model->getStateCaptions(); // esteve
             $data['tabularPartialView'] = $this->load->view('calendar/tabular_partial', $data, TRUE);
             $this->load->view('templates/header', $data);
             $this->load->view('menu/index', $data);
@@ -340,6 +358,7 @@ class Calendar extends CI_Controller {
             $data['year'] = $year;
             $data['children'] = $children;
             $data['displayTypes'] = $displayTypes;
+            $data['stateCaptions'] = $this->leaves_model->getStateCaptions(); // esteve
             $this->load->view('calendar/tabular_partial', $data);
         } else {
             setUserContext($this);
@@ -356,6 +375,7 @@ class Calendar extends CI_Controller {
             $data['year'] = $year;
             $data['children'] = $children;
             $data['displayTypes'] = $displayTypes;
+            $data['stateCaptions'] = $this->leaves_model->getStateCaptions(); // esteve
             $this->load->view('calendar/tabular_partial', $data);
         }
     }

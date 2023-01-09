@@ -7,10 +7,14 @@
  * @since         0.1.0
  */
 ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.5.1/jscolor.min.js"></script>
+<link rel="stylesheet" href="<?php echo base_url();?>assets/font-awesome/css/font-awesome.min.css">
 
 <h2><?php echo lang('leavetypes_type_title');?><?php echo $help;?></h2>
 
 <p><?php echo lang('leavetypes_type_description');?></p>
+
+<?php echo $leaveColors; ?>
 
 <?php echo $flash_partial_view;?>
 
@@ -20,7 +24,11 @@
       <th><?php echo lang('leavetypes_type_thead_id');?></th>
       <th><?php echo lang('leavetypes_type_thead_acronym');?></th>
       <th><?php echo lang('leavetypes_type_thead_name');?></th>
-     <th><?php echo lang('leavetypes_type_thead_deduct');?></th>
+      <th><?php echo lang('leavetypes_type_thead_deduct');?></th>
+      <th><?php echo lang('leavetype_nodeduction');?> <i class="mdi mdi-information-outline nolink" style="font-size:16px" title="<?php echo lang('leavetype_nodeduction_hint');?>"></i></th>
+      <th><?php echo lang('leavetype_noapproval');?> <i class="mdi mdi-information-outline nolink" style="font-size:16px" title="<?php echo lang('leavetype_noapproval_hint');?>"></i></th>
+      <th><?php echo lang('leavetype_approve_by_admin');?> <i class="mdi mdi-information-outline nolink" style="font-size:16px" title="<?php echo lang('leavetype_approve_by_admin_hint');?>"></i></th>
+      <th><?php echo lang('leavetype_limit');?> <i class="mdi mdi-information-outline nolink" style="font-size:16px" title="<?php echo lang('leavetype_limit_hint');?>"></i></th>
     </tr>
   </thead>
   <tbody>
@@ -34,7 +42,7 @@
       <td>
           <?php echo $type['acronym']; ?>
       </td>
-      <td>
+      <td class="leave<?=$type['id']?>">
           <a href="<?php echo base_url();?>leavetypes/edit/<?php echo $type['id'] ?>" data-target="#frmEditLeaveType" data-toggle="modal" title="<?php echo lang('leavetypes_type_thead_tip_edit');?>"><i class="mdi mdi-pencil nolink"></i></a>
           &nbsp; <?php echo $type['name']; ?>
       </td>
@@ -43,6 +51,32 @@
         <i class="mdi mdi-checkbox-marked-outline"></i>
         <?php } else { ?>
         <i class="mdi mdi-checkbox-blank-outline"></i>
+        <?php } ?>
+      </td>
+      <td>
+        <?php if (isset($type['nodeduction']) && $type['nodeduction'] == TRUE ) { ?>
+        <i class="mdi mdi-checkbox-marked-outline"></i>
+        <?php } else { ?>
+        <i class="mdi mdi-checkbox-blank-outline"></i>
+        <?php } ?>
+      </td>
+        <td>
+            <?php if (isset($type['noapproval']) && $type['noapproval'] == TRUE ) { ?>
+                <i class="mdi mdi-checkbox-marked-outline"></i>
+            <?php } else { ?>
+                <i class="mdi mdi-checkbox-blank-outline"></i>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if (isset($type['approvebyadmin']) && $type['approvebyadmin'] == TRUE ) { ?>
+                <i class="mdi mdi-checkbox-marked-outline"></i>
+            <?php } else { ?>
+                <i class="mdi mdi-checkbox-blank-outline"></i>
+            <?php } ?>
+        </td>
+      <td>
+        <?php if (isset($type['limit'])) { ?>
+            <?=$type['limit']?>
         <?php } ?>
       </td>
     </tr>

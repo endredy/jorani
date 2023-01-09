@@ -36,6 +36,8 @@ class LeaveTypes extends CI_Controller {
         $data['title'] = lang('leavetypes_type_title');
         $data['help'] = $this->help->create_help_link('global_link_doc_page_edit_leave_type');
         $data['flash_partial_view'] = $this->load->view('templates/flash', $data, TRUE);
+        $data['leaveColors'] = $this->leaves_model->getLeaveTypeStyle(); // esteve
+        $data['leaveLimits'] = $this->leaves_model->getLeaveTypeLimits(); // esteve
         $this->load->view('templates/header', $data);
         $this->load->view('menu/index', $data);
         $this->load->view('leavetypes/index', $data);
@@ -88,7 +90,14 @@ class LeaveTypes extends CI_Controller {
             $this->types_model->updateTypes($id,
                     $this->input->post('name'),
                     $this->input->post('deduct_days_off'),
-                    $this->input->post('acronym'));
+                    $this->input->post('acronym'),
+                    $this->input->post('nodeduction'),
+                    $this->input->post('noapproval'),
+                    $this->input->post('approvebyadmin'),
+                    $this->input->post('extrainput'),
+                    $this->input->post('limit'),
+                    $this->input->post('color'),
+                    $this->input->post('textcolor'));
             $this->session->set_flashdata('msg', lang('leavetypes_popup_update_flash_msg'));
             redirect('leavetypes');
         }

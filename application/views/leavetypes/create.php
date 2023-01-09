@@ -23,6 +23,34 @@ echo form_open('leavetypes/create', $attributes); ?>
         <input type="checkbox" name="deduct_days_off" id="deduct_days_off" />
         <?php echo lang('leavetypes_popup_create_field_deduct');?>
     </label>
+
+    <label for="nodeduction">
+        <input type="checkbox" class="filterStatus" name="nodeduction" id="nodeduction" value="1"/>
+        <?php echo lang('leavetype_nodeduction'); ?> <i class="mdi mdi-information-outline nolink" style="font-size:16px" title="<?php echo lang('leavetype_nodeduction_hint');?>"></i>
+    </label>
+
+    <label for="noapproval">
+        <input type="checkbox" class="filterStatus" name="noapproval" id="noapproval" value="1"/>
+        <?php echo lang('leavetype_noapproval'); ?> <i class="mdi mdi-information-outline nolink" style="font-size:16px" title="<?php echo lang('leavetype_noapproval_hint');?>"></i>
+    </label>
+
+    <label for="approvebyadmin">
+        <input type="checkbox" class="filterStatus" name="approvebyadmin" id="approvebyadmin" value="1"/>
+        <?php echo lang('leavetype_approve_by_admin'); ?> <i class="mdi mdi-information-outline nolink" style="font-size:16px" title="<?php echo lang('leavetype_approve_by_admin_hint');?>"></i>
+    </label>
+
+<label for="extrainput"><?php echo lang('leavetype_extrainput');?> <i class="mdi mdi-information-outline nolink" style="font-size:16px" title="<?php echo lang('leavetype_extrainput_hint');?>"></i></label>
+<input id="extrainput" name="extrainput" value="" />
+
+    <label for="limit"><?php echo lang('leavetype_limit');?> <i class="mdi mdi-information-outline nolink" style="font-size:16px" title="<?php echo lang('leavetype_limit_hint');?>"></i></label>
+    <input id="spinner" name="limit" type="number" min="0" style="width: 60px;" value="">
+
+    <label for="color"><?php echo lang('leavetype_color');?></label>
+    <input data-jscolor="{}" id="color" name="color" value="" />
+
+    <label for="color"><?php echo lang('leavetype_textcolor');?></label>
+    <input data-jscolor="{}" id="textcolor" name="textcolor" value="" />
+
     <br />
 </form>
 <button id="cmdCreateLeaveType" class="btn btn-primary"><?php echo lang('leavetypes_popup_create_button_create');?></button>
@@ -48,5 +76,7 @@ echo form_open('leavetypes/create', $attributes); ?>
               });
             $('#acronym').val(result);
         });
+
+        jscolor.install(); // init color picker
     });
 </script>

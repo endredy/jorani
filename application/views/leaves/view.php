@@ -73,6 +73,84 @@ switch ($leave['status']) {
 </div>
 <div class="span6">
 
+    <style>
+        .resizer { display:flex; margin:0; padding:0; resize:both; overflow:hidden }
+        .resizer > .resized { flex-grow:1; margin:0; padding:0; border:0; min-width: 100%; height: 100%; min-height: 400px }
+        .ugly { border:1px solid gray; }
+        .highlight {background-color: yellow}
+        .requestedCell,.requestedCellFirst,.requestedCellEnd { border-top: 3px solid yellow !important; border-bottom: 3px solid yellow !important;}
+        .requestedCellFirst {border-left: 3px solid yellow !important}
+        .requestedCellEnd {border-right: 3px solid yellow !important}
+    </style>
+    <div class="resizer ugly span12 hide" >
+        <iframe id="tabFrameId" src="" class="resized"></iframe>
+    </div>
+
+    <?php $this->lang->load('calendar', $language); // for tabular calendar caption :)
+//    $om = $this->load->model('organization_model' );
+//    $o = $om->getDepartment($leave['employee']); // $this->organization_model->getDepartment($leave['employee']);
+//    $o = $this->organ->getDepartment($leave['employee']);
+//    $o = $om->organization_model->getDepartment($leave['employee']);
+    $department = $this->organization_model->getDepartment($leave['employee']);
+    $employeeName = $this->users_model->getName($leave['employee']);
+
+//$o = userdepartment($leave['employee']);
+    $showDepartmentTabularCalendar = $this->session->userdata['is_manager'] || $this->session->userdata['is_hr'];
+//    var_dump($this->organization_model->getDepartment(2));
+
+    if ($showDepartmentTabularCalendar){
+    ?>
+    <div id="onlyTabId"></div>
+    <button type="button" class="btn btn-primary" onclick="toggleTabularClick(this)"><i class="mdi mdi-toggle-switch"></i> <?php echo lang('calendar_tabular_title');?></button>
+
+    <script>
+        var startD = new Date('<?=$leave['startdate']?>');
+        var entity = <?=$department->id?>; // Id of the employee's organization entity
+        var month = startD.getMonth(); //Monent.js uses 0 based numbers!
+        var year = startD.getFullYear();
+        var children = '1';
+        var displayTypes = '1';
+        var statuses = "?statuses=1|2|3|5";
+        var first = 1;
+        var url = '<?php echo base_url();?>calendar/tabular/partial/' +
+            entity + '/' + (month + 1) + '/' + year + '/' + children + '/' +
+            displayTypes + statuses;
+        $(function(){
+            // $("#onlyTabId").load(url, function(response, status, xhr) {
+        $.get(url, null, function (response) {
+
+                response = response.replace(/<td>(<?=$employeeName?>)/ig, '<td class="highlight">$1');
+                response = response.replace(/(<td[^>]+class=["'][^'"]*)(["'])([^>]* data-id=["'](?:\d+;)*<?=$leave['id']?>(?:;?\d+)*["'])/ig, "$1 requestedCell$2$3");
+                const onlyOneDay = (<?=$leave['duration']?> <= 1);
+                response = response.replace(/requestedCell/, onlyOneDay ? "requestedCellFirst requestedCellEnd" : "requestedCellFirst");
+                if (!onlyOneDay) {
+                    const p = response.lastIndexOf('requestedCell');
+                    if (p > 0) {
+                        const l = 13;
+                        response = response.substring(0, p) + 'requestedCellEnd' + response.substring(p+l);
+                    }
+                }
+            // console.log(response);
+            $('#onlyTabId').html(response);
+            });
+            // http://localhost/jorani/calendar/tabular/partial/2/12/2022/1/1
+        });
+
+        function toggleTabularClick(b){
+            $('#onlyTabId').toggle();
+            const a = $('#tabFrameId');
+            if (first)
+                a.attr('src', url.replace('partial/', ''));
+            a.parent().toggle();
+            const icon = $(b).find('i');
+            if (icon.hasClass('mdi-toggle-switch-off'))
+                icon.removeClass('mdi-toggle-switch-off').addClass('mdi-toggle-switch');
+            else
+                icon.removeClass('mdi-toggle-switch').addClass('mdi-toggle-switch-off');
+        }
+    </script>
+<?php } ?>
+
   <h4><?php echo lang('leaves_comment_title');?></h4>
   <?php
   if(isset($leave["comments"])){

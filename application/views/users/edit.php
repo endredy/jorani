@@ -224,6 +224,34 @@ if (isset($_GET['source'])) {
     </div>
 </div>
 
+<hr/>
+
+<div class="row">
+    <div class="span4">
+        &nbsp;
+        <div class="control-group">
+            <label class="control-label" for="home_office_limit"><?php echo lang('users_edit_field_home_office_limit');?></label>
+            <div class="controls">
+                <input type="number" name="home_office_limit" value="<?php echo $users_item['home_office_limit']; ?>" />
+            </div>
+        </div>
+
+    </div>
+
+    <div class="span4">
+        &nbsp;
+        <div class="control-group">
+            <label class="control-label" for="users_edit_field_birthday"><?php echo lang('users_edit_field_birthday');?></label>
+            <div class="controls">
+                <input type="text" id="birthday" name="birthday" value="<?php echo $users_item['birthday']; ?>" />
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
 <div class="row-fluid">
     <div class="span12">
         <button type="submit" class="btn btn-primary"><i class="mdi mdi-check"></i>&nbsp;<?php echo lang('users_edit_button_update');?></button>
@@ -323,13 +351,13 @@ if (isset($_GET['source'])) {
 
     //Init datepicker for using an alternative field and format
     $(document).ready(function() {
-        $("#viz_datehired").datepicker({
+        $("#viz_datehired,#birthday").datepicker({
           format: '<?php echo lang('global_date_js_format');?>',
           language: "<?php echo $language_code;?>",
           startDate: "01/01/1970",
           autoclose: true
         }).on('changeDate', function(e){
-          $('#datehired').val(e.format('yyyy-mm-dd'));
+          $(e.target.id=='birthday' ? e.target : '#datehired').val(e.format('yyyy-mm-dd'));
         });
 
         //Transform SELECT tags in richer controls

@@ -20,6 +20,9 @@ $currentDay = (int)date('d');
         <span class="label label-success"><?php echo lang('Accepted');?></span>&nbsp;
         <span class="label label-warning"><?php echo lang('Requested');?></span>&nbsp;
         <span class="label label-important" style="background-color: #ff0000;"><?php echo lang('Rejected');?></span>
+
+        <span class="col-6"></span>
+        <?php require_once ('legend.php'); ?>
     </div>
     <div class="span4">
         <a href="<?php echo base_url();?>calendar/year/export/<?php echo $employee_id;?>/<?php echo ($year);?>" class="btn btn-primary"><i class="mdi mdi-download"></i>&nbsp;<?php echo lang('calendar_year_button_export');?></a>

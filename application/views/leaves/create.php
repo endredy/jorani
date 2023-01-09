@@ -10,6 +10,8 @@
 
 <h2><?php echo lang('leaves_create_title');?> &nbsp;<?php echo $help;?></h2>
 
+<a href="createEx" class="btn btn-primary"><i class="mdi mdi-calendar" aria-hidden="true"></i> Grafikus felület :)</a></h4>
+
 <div class="row-fluid">
     <div class="span8">
 
@@ -21,7 +23,7 @@ echo form_open('leaves/create', $attributes) ?>
 
     <label for="type">
         <?php echo lang('leaves_create_field_type');?>
-        &nbsp;<span class="muted" id="lblCredit"><?php if (!is_null($credit)) { ?>(<?php echo $credit; ?>)<?php } ?></span>
+        &nbsp;<span class="muted" id="lblCredit" title="<?php echo lang('leaves_view_field_duration'); ?>"><?php if (!is_null($credit)) { ?>(<?php echo $credit; ?>)<?php } ?></span>
     </label>
     <select class="input-xxlarge" name="type" id="type">
     <?php foreach ($types as $typeId => $TypeName): ?>
@@ -53,6 +55,11 @@ echo form_open('leaves/create', $attributes) ?>
     <?php } ?>
 
     <span style="margin-left: 2px;position: relative;top: -5px;" id="spnDayType"></span>
+
+    <?php if (true) { ?>
+        <label for="extrainput" id="extrainputLabel"><?php echo $typesWithExtraInput['extrainput'];?></label>
+        <input type="text" name="extrainput" id="extrainput" value="<?php echo set_value('extrainput'); ?>" />
+    <?php }  ?>
 
     <div class="alert hide alert-error" id="lblCreditAlert" onclick="$('#lblCreditAlert').hide();">
         <button type="button" class="close">&times;</button>
@@ -119,6 +126,13 @@ $(document).on("click", "#showNoneWorkedDay", function(e) {
 
     var overlappingWithDayOff = "<?php echo lang('leaves_flash_msg_overlap_dayoff');?>";
     var listOfDaysOffTitle = "<?php echo lang('leaves_flash_spn_list_days_off');?>";
+    var validatedInfo = null;
+    var apprException = [
+    <?php foreach($typeDefs as $t) {
+        if ($t['nodeduction'] == 1) {
+            echo $t['id'] . ',';
+        }
+    }?>];
 
 function validate_form() {
     var fieldname = "";
@@ -126,6 +140,16 @@ function validate_form() {
     //Call custom trigger defined into local/triggers/leave.js
     if (typeof triggerValidateCreateForm == 'function') {
        if (triggerValidateCreateForm() == false) return false;
+    }
+
+    if (validatedInfo.overlap){
+        bootbox.alert("<?php echo lang('leaves_create_field_overlapping_message');?>");
+        return false;
+    }
+
+    if (apprException.indexOf($('#type option:selected').val()) != -1 && validatedInfo.length > validatedInfo.credit){
+        bootbox.alert("<?php echo lang('leaves_create_field_duration_message');?>");
+        return false;
     }
 
     if ($('#viz_startdate').val() == "") fieldname = "<?php echo lang('leaves_create_field_start');?>";
@@ -152,7 +176,30 @@ function keyAllowed(key) {
 
 $(function () {
     //Selectize the leave type combo
-    $('#type').select2();
+    $('#type').select2().change(function () {
+        const id = $(this).find("option:selected").val();
+        toggleExtraInput(id);
+    }).change(); // esteve
+
+    // read def params (esteve)
+    var p = new URLSearchParams(window.location.search);
+    if (p.has('s')) {
+        const m = moment(p.get('s'), 'YYYY-MM-DD');
+        $('#viz_startdate').attr('value', m.format(dateMomentJsFormat));
+        $('#startdate').attr('value', m.format('YYYY-MM-DD')); // leave.edit has this burnt format
+    }
+    if (p.has('e')) {
+        const m = moment(p.get('e'), 'YYYY-MM-DD');
+        $('#viz_enddate').attr('value', m.format(dateMomentJsFormat));
+        $('#enddate').attr('value', m.format('YYYY-MM-DD'));
+    }
+    if (p.has('c'))
+        $('textarea[name=cause]').val(p.get('c'));
+    if (p.has('t')) {
+        leaveId = p.get('t');
+        $('select[name=type]').val(leaveId).change();
+    }
+    setTimeout(getLeaveLength, 500); // count duration :)
 
 <?php if ($this->config->item('disallow_requests_without_credit') == TRUE) {?>
     var durationField = document.getElementById("duration");
@@ -181,5 +228,13 @@ $(function () {
     });
 });
 <?php }?>
+
+    function toggleExtraInput(selectedTypeId){
+        if (selectedTypeId == <?=$typesWithExtraInput['id']?>){
+            $('#extrainputLabel,#extrainput').show();
+            $('#extrainputLabel').attr('required', 'required'); // if it is visible, it is mandatory
+        }else
+            $('#extrainputLabel,#extrainput').hide();
+    }
 </script>
 <script type="text/javascript" src="<?php echo base_url();?>assets/js/lms/leave.edit-0.7.0.js" type="text/javascript"></script>

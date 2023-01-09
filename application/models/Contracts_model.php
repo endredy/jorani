@@ -271,10 +271,10 @@ class Contracts_model extends CI_Model {
         }
 
         //Build the list of types
-        $types = $this->types_model->getTypesAsArray();
+        $types = $this->types_model->getTypesAsArray(0, $leaveType);
         //Compute the credit of entitlment for the default leave type
         if (is_null($leaveType)) {
-            $credit = $this->leaves_model->getLeavesTypeBalanceForEmployee($userId, $types[$defaultType]);
+            $credit = $this->leaves_model->getLeavesTypeBalanceForEmployee($userId, isset($types[$defaultType]) ? $types[$defaultType] : array_values($types)[0]);
         } else {
             $credit = $this->leaves_model->getLeavesTypeBalanceForEmployee($userId, $types[$leaveType]);
         }

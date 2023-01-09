@@ -328,6 +328,7 @@ class Requests extends CI_Controller {
                 $data['defaultType'] = $leaveTypesDetails->defaultType;
                 $data['credit'] = $leaveTypesDetails->credit;
                 $data['types'] = $leaveTypesDetails->types;
+                $data['typesWithExtraInput'] = $this->types_model->getTypesWithExtraInput();
                 $this->load->model('users_model');
                 $data['name'] = $this->users_model->getName($id);
                 $this->load->view('templates/header', $data);

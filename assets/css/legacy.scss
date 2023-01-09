@@ -315,209 +315,6 @@ html, body {
     background: linear-gradient(135deg, #000000 50%,#ff0000 50%); /* W3C */
 }
 
-/*Single day*/
-
-.amplanned {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #999 50%, #ffffff 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#999), color-stop(50%,#ffffff)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #999 50%,#ffffff 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #999 50%,#ffffff 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #999 50%,#ffffff 50%); /* IE10+ */
-    background: linear-gradient(135deg, #999 50%,#ffffff 50%); /* W3C */
-}
-
-.amrequested {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #f89406 50%, #ffffff 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#f89406), color-stop(50%,#ffffff)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #f89406 50%,#ffffff 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #f89406 50%,#ffffff 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #f89406 50%,#ffffff 50%); /* IE10+ */
-    background: linear-gradient(135deg, #f89406 50%,#ffffff 50%); /* W3C */
-}
-
-.amaccepted {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #468847 50%, #ffffff 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#468847), color-stop(50%,#ffffff)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #468847 50%,#ffffff 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #468847 50%,#ffffff 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #468847 50%,#ffffff 50%); /* IE10+ */
-    background: linear-gradient(135deg, #468847 50%,#ffffff 50%); /* W3C */
-}
-
-.amrejected {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #ff0000 50%, #ffffff 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#ff0000), color-stop(50%,#ffffff)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #ff0000 50%,#ffffff 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #ff0000 50%,#ffffff 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #ff0000 50%,#ffffff 50%); /* IE10+ */
-    background: linear-gradient(135deg, #ff0000 50%,#ffffff 50%); /* W3C */
-}
-
-.pmplanned {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #ffffff 50%, #999 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#ffffff), color-stop(50%,#999)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #ffffff 50%,#999 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #ffffff 50%,#999 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #ffffff 50%,#999 50%); /* IE10+ */
-    background: linear-gradient(135deg, #ffffff 50%,#999 50%); /* W3C */
-}
-
-.pmrequested {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #ffffff 50%, #f89406 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#ffffff), color-stop(50%,#f89406)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #ffffff 50%,#f89406 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #ffffff 50%,#f89406 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #ffffff 50%,#f89406 50%); /* IE10+ */
-    background: linear-gradient(135deg, #ffffff 50%,#f89406 50%); /* W3C */
-}
-
-.pmaccepted {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #ffffff 50%, #468847 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#ffffff), color-stop(50%,#468847)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #ffffff 50%,#468847 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #ffffff 50%,#468847 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #ffffff 50%,#468847 50%); /* IE10+ */
-    background: linear-gradient(135deg, #ffffff 50%,#468847 50%); /* W3C */
-}
-
-.pmrejected {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #ffffff 50%, #ff0000 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#ffffff), color-stop(50%,#ff0000)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #ffffff 50%,#ff0000 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #ffffff 50%,#ff0000 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #ffffff 50%,#ff0000 50%); /* IE10+ */
-    background: linear-gradient(135deg, #ffffff 50%,#ff0000 50%); /* W3C */
-}
-
-/*Overlapping*/
-.plannedrequested {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #999 50%, #f89406 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#999), color-stop(50%,#f89406)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #999 50%,#f89406 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #999 50%,#f89406 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #999 50%,#f89406 50%); /* IE10+ */
-    background: linear-gradient(135deg, #999 50%,#f89406 50%); /* W3C */
-}
-
-.plannedaccepted {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #999 50%, #468847 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#999), color-stop(50%,#468847)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #999 50%,#468847 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #999 50%,#468847 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #999 50%,#468847 50%); /* IE10+ */
-    background: linear-gradient(135deg, #999 50%,#468847 50%); /* W3C */
-}
-
-.plannedrejected {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #999 50%, #ff0000 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#999), color-stop(50%,#ff0000)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #999 50%,#ff0000 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #999 50%,#ff0000 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #999 50%,#ff0000 50%); /* IE10+ */
-    background: linear-gradient(135deg, #999 50%,#ff0000 50%); /* W3C */
-}
-
-.requestedplanned {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #f89406 50%, #999 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#f89406), color-stop(50%,#999)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #f89406 50%,#999 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #f89406 50%,#999 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #f89406 50%,#999 50%); /* IE10+ */
-    background: linear-gradient(135deg, #f89406 50%,#999 50%); /* W3C */
-}
-
-.requestedaccepted {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #f89406 50%, #468847 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#f89406), color-stop(50%,#468847)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #f89406 50%,#468847 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #f89406 50%,#468847 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #f89406 50%,#468847 50%); /* IE10+ */
-    background: linear-gradient(135deg, #f89406 50%,#468847 50%); /* W3C */
-}
-
-.requestedrejected {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #f89406 50%, #ff0000 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#f89406), color-stop(50%,#ff0000)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #f89406 50%,#ff0000 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #f89406 50%,#ff0000 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #f89406 50%,#ff0000 50%); /* IE10+ */
-    background: linear-gradient(135deg, #f89406 50%,#ff0000 50%); /* W3C */
-}
-
-.acceptedplanned {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #468847 50%, #999 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#468847), color-stop(50%,#999)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #468847 50%,#999 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #468847 50%,#999 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #468847 50%,#999 50%); /* IE10+ */
-    background: linear-gradient(135deg, #468847 50%,#999 50%); /* W3C */
-}
-
-.acceptedrequested {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #468847 50%, #f89406 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#468847), color-stop(50%,#f89406)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #468847 50%,#f89406 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #468847 50%,#f89406 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #468847 50%,#f89406 50%); /* IE10+ */
-    background: linear-gradient(135deg, #468847 50%,#f89406 50%); /* W3C */
-}
-
-.acceptedrejected {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #468847 50%, #ff0000 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#468847), color-stop(50%,#ff0000)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #468847 50%,#ff0000 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #468847 50%,#ff0000 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #468847 50%,#ff0000 50%); /* IE10+ */
-    background: linear-gradient(135deg, #468847 50%,#ff0000 50%); /* W3C */
-}
-
-.rejectedplanned {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #ff0000 50%, #999 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#ff0000), color-stop(50%,#999)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #ff0000 50%,#999 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #ff0000 50%,#999 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #ff0000 50%,#999 50%); /* IE10+ */
-    background: linear-gradient(135deg, #ff0000 50%,#999 50%); /* W3C */
-}
-
-.rejectedrequested {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #ff0000 50%, #f89406 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#ff0000), color-stop(50%,#f89406)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #ff0000 50%,#f89406 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #ff0000 50%,#f89406 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #ff0000 50%,#f89406 50%); /* IE10+ */
-    background: linear-gradient(135deg, #ff0000 50%,#f89406 50%); /* W3C */
-}
-
-.rejectedaccepted {
-    color: white;
-    background: -moz-linear-gradient(-45deg, #ff0000 50%, #468847 50%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#ff0000), color-stop(50%,#468847)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, #ff0000 50%,#468847 50%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, #ff0000 50%,#468847 50%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, #ff0000 50%,#468847 50%); /* IE10+ */
-    background: linear-gradient(135deg, #ff0000 50%,#468847 50%); /* W3C */
-}
-
 /* Calendar/Tabular Current Day */
 td.currentday-bg {
     background-color: #FCF8E3;
@@ -571,3 +368,113 @@ td.currentday-border {
   position: relative;
   top: -2px;
 }
+
+/*esteve*/
+.allrequested{
+    background: center no-repeat url("../images/requested.png");
+}
+
+.allrejected,.pmrejected,.amrejected{
+    background: center no-repeat url("../images/cancel.png");
+}
+
+.allplanned{
+    background: center no-repeat url("../images/question.png");
+}
+
+.amplanned{
+    background: center no-repeat url("../images/question.png"), linear-gradient( 45deg, transparent, transparent 35px, white 5px );
+}
+.pmplanned{
+    background: center no-repeat url("../images/question.png"), linear-gradient( 45deg, white, white 30px, transparent 5px );
+}
+
+.amrequested{
+    background: center no-repeat url("../images/requested.png"), linear-gradient( 45deg, transparent, transparent 35px, white 5px );
+}
+
+.amrejected{
+    background: center no-repeat url("../images/cancel.png"), linear-gradient( 45deg, transparent, transparent 35px, white 5px);
+}
+
+.pmrequested{
+    background: center no-repeat url("../images/requested.png"), linear-gradient( 45deg, white, white 30px, transparent 5px );
+}
+
+.pmrejected{
+    background: center no-repeat url("../images/cancel.png"), linear-gradient( 45deg, white, white 30px, transparent 5px );
+}
+
+.amaccepted{
+    background: linear-gradient( 45deg, transparent, transparent 35px, white 5px );
+}
+.pmaccepted{
+    background: linear-gradient( 45deg, white, white 30px, transparent 5px );
+}
+.plannedrequested,.plannedaccepted,.plannedrejected,.requestedplanned,.requestedaccepted,
+.requestedrejected,.acceptedplanned,.acceptedrequested,.acceptedrejected,.rejectedplanned,.rejectedrequested,
+.rejectedaccepted{
+    background: center no-repeat url("../images/multiple.png")
+}
+/* csikos valtozat
+
+.allrequested,.pmrequested,.amrequested{
+    background:  repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            #ccc 10px,
+            #ccc 20px
+    );
+}
+
+.allrejected,.pmrejected,.amrejected{
+    background: repeating-linear-gradient( -45deg, transparent, transparent 5px, #ff0000 5px, #ff0000 10px );
+}
+
+.allplanned{
+    background:  repeating-linear-gradient(
+            -90deg,
+            transparent,
+            transparent 10px,
+            #ccc 10px,
+            #ccc 20px
+    );
+    background-size: 15px 15px;
+}
+
+.amplanned{
+    background: linear-gradient( 45deg, transparent, transparent 35px, white 5px ),
+     repeating-linear-gradient(-90deg, transparent, transparent 10px, #ccc 10px, #ccc 20px);
+}
+.pmplanned{
+    background: linear-gradient( 45deg, white, white 30px, transparent 5px ),
+    repeating-linear-gradient(-90deg, transparent, transparent 10px, #ccc 10px, #ccc 20px);
+}
+
+.amrequested{
+    background: linear-gradient( 45deg, transparent, transparent 35px, white 5px ), repeating-linear-gradient( 45deg, transparent, transparent 10px, #ccc 10px, #ccc 20px );
+}
+
+.amrejected{
+    background: linear-gradient( 45deg, transparent, transparent 35px, white 5px ), repeating-linear-gradient( -45deg, transparent, transparent 5px, #ff0000 5px, #ff0000 10px );
+}
+
+.pmrequested{
+    background: linear-gradient( 45deg, white, white 30px, transparent 5px ), repeating-linear-gradient( 45deg, transparent, transparent 10px, #ccc 10px, #ccc 20px );
+}
+
+.pmrejected{
+    background: linear-gradient( 45deg, white, white 30px, transparent 5px ), repeating-linear-gradient( -45deg, transparent, transparent 5px, #ff0000 5px, #ff0000 10px );
+}
+
+.amaccepted{
+    background: linear-gradient( 45deg, transparent, transparent 35px, white 5px );
+}
+
+.pmaccepted{
+    background: linear-gradient( 45deg, white, white 30px, transparent 5px );
+}
+*/
+
+

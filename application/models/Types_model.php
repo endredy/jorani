@@ -30,7 +30,11 @@ class Types_model extends CI_Model {
      */
     public function getTypes($id = 0) {
         if ($id === 0) {
-            $query = $this->db->get('types');
+            if ($this->config->item('hideZeroLeaveType')){
+                $query = $this->db->get_where('types', 'id != 0');
+            }else {
+                $query = $this->db->get('types');
+            }
             return $query->result_array();
         }
         $query = $this->db->get_where('types', array('id' => $id));
@@ -50,13 +54,22 @@ class Types_model extends CI_Model {
     
     /**
      * Get the list of types as an ordered associative array
+     * @param int $id
+     * @param null $selectedId selected type (optional), if the selected type is forbidden one, then we will show it
      * @return array Associative array of types (id, name)
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function getTypesAsArray($id = 0) {
+    public function getTypesAsArray($id = 0, $selectedId = NULL) {
         $listOfTypes = array();
         $this->db->from('types');
         $this->db->order_by('name');
+
+        //add out office types (esteve)
+        if ($this->config->item('hideZeroLeaveType') && $selectedId !== '0') {
+            $this->db->where('id != 0');
+        }
+//        $this->db->join('parameters', 'parameters.entity_id = types.id', 'LEFT', TRUE);
+        $this->db->select('types.*'); //, parameters.value as spec
         $rows = $this->db->get()->result_array();
         foreach ($rows as $row) {
             $listOfTypes[$row['id']] = $row['name'];
@@ -85,7 +98,14 @@ class Types_model extends CI_Model {
         $data = array(
             'acronym' => $this->input->post('acronym'),
             'name' => $this->input->post('name'),
-            'deduct_days_off' => $deduct
+            'deduct_days_off' => $deduct,
+            'color' => $this->input->post('color'),
+            'textcolor' => $this->input->post('textcolor'),
+            'limit' => $this->input->post('limit'),
+            'nodeduction' => $this->input->post('nodeduction'),
+            'noapproval' => $this->input->post('noapproval'),
+            'approvebyadmin' => $this->input->post('approvebyadmin'),
+            'extrainput' => $this->input->post('extrainput') == '' ? NULL : $this->input->post('extrainput')
         );
         return $this->db->insert('types', $data);
     }
@@ -108,17 +128,32 @@ class Types_model extends CI_Model {
      * @return int number of affected rows
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function updateTypes($id, $name, $deduct, $acronym) {
+    public function updateTypes($id, $name, $deduct, $acronym, $nodeduction=NULL, $noapproval=NULL, $approvebyadmin=NULL, $extrainput=NULL, $limit=NULL, $color=NULL, $textcolor=NULL) {
         $deduct = ($deduct == 'on')?TRUE:FALSE;
         $data = array(
             'acronym' => $acronym,
             'name' => $name,
-            'deduct_days_off' => $deduct
+            'deduct_days_off' => $deduct,
+            'noapproval' => $noapproval == 0 ? NULL : $noapproval,
+            'approvebyadmin' => $approvebyadmin == 0 ? NULL : $approvebyadmin,
+            'nodeduction' => $nodeduction == 0 ? NULL : $nodeduction,
+            'extrainput' => $extrainput == '' ? NULL : $extrainput,
+            'limit' => $limit == 0 ? NULL : $limit,
+            'color' => $color,
+            'textcolor' => $textcolor
         );
         $this->db->where('id', $id);
         return $this->db->update('types', $data);
     }
-    
+
+
+    public function getTypesWithExtraInput(){
+        $this->db->select('id, extrainput');
+        $this->db->from('types');
+        $this->db->where('extrainput IS NOT NULL');
+        return $this->db->get()->row_array();
+    }
+
     /**
      * Count the number of time a leave type is used into the database
      * @param int $id identifier of the leave type record

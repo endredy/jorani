@@ -9,6 +9,12 @@
  * @since      0.6.0
  */
 ?>
+<?php
+if (!isset($leaveColors)) {
+    $leaveColors = $this->leaves_model->getLeaveTypeStyle(); // esteve
+}
+echo $leaveColors;
+?>
 
 <?php
 if (count($tabular) > 0) {?>
@@ -163,6 +169,17 @@ if (count($tabular) > 0) {?>
           if($isCurrentMonth && $dayIterator === $currentDay){
               $class .= ' currentday-border';
           }
+
+          // colors of each leave types (esteve)
+          if (isset($day->leaveTypeId)){
+              $css = ' leave';
+              if (strstr($day->leaveTypeId, ';') !== false){
+                  $css .= implode(' leave', explode(';', $day->leaveTypeId));
+              }else {
+                  $css .= $day->leaveTypeId;
+              }
+            $class .= $css;
+          }
             if ($class == "error"){
                 echo '<td><img src="'.  base_url() .'assets/images/date_error.png"></td>';
             } else {
@@ -176,7 +193,7 @@ if (count($tabular) > 0) {?>
                             ($is_admin == TRUE) || 
                             ($employee->manager == $user_id) || 
                             ($employee->id == $user_id)) {
-                        $dayType = $day->type;
+                        $dayType = isset($day->title) ? $day->title : $day->type;//type . (isset($stateCaptions[$day->status]) ? ' (' . $stateCaptions[$day->status] . ')' : '');
                         $acronym = $day->acronym;
                         $dataIds= $day->id;
                         if ((!$overlapping) && ($day->id !== 0)) {
@@ -207,7 +224,7 @@ if (count($tabular) > 0) {?>
                             }
                             echo "<td title='$dayType' class='$class' style='$style' data-id='$dataIds'>$acronym</td>";
                         } else {
-                            echo "<td class='$class' style='font-size: 0.7em;' data-id='$dataIds'>";
+                            echo "<td class='$class' title='$dayType' style='font-size: 0.7em;' data-id='$dataIds'>";
                             echo '  <span title="' . $dayType . '" class="pull-left">' . $acronyms[0] . '</span>';
                             echo '  <span title="' . $dayType . '" class="pull-right" >' . $acronyms[1] . '</span>';
                             echo '</td>';

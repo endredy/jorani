@@ -50,3 +50,16 @@ $lang['leavetypes_type_export_thead_id'] = 'ID';
 $lang['leavetypes_type_export_thead_name'] = 'Név';
 $lang['leavetypes_type_export_thead_acronym'] = 'Acronym';
 $lang['leavetypes_type_export_thead_deduct'] = 'Levonja a munka szüneti napokat';
+
+$lang['leavetype_color'] = 'Szín';
+$lang['leavetype_color_hint'] = 'pl a naptárakban';
+$lang['leavetype_nodeduction'] = 'Nincs levonás';
+$lang['leavetype_nodeduction_hint'] = 'Ez a típus független a munkavállaló fizetett szabadságától (pl home office, betegszabi, stb). Ez a típus nem csökkenti a szabadságos napokat.';
+$lang['leavetype_noapproval'] = 'Nincs elfogadás';
+$lang['leavetype_noapproval_hint'] = 'Ennél a típusnál nem szükséges az elfogadás (pl külső helyszínen való munka)';
+$lang['leavetype_approve_by_admin'] = 'Az admin fogadja el';
+$lang['leavetype_approve_by_admin_hint'] = 'Ezt a típust az admin fogadja el (pl betegszabi)';
+$lang['leavetype_extrainput'] = 'Extra adat';
+$lang['leavetype_extrainput_hint'] = 'Ez a típus igényel egy extra adatot (pl a külső helyszín nevét)';
+$lang['leavetype_limit'] = 'Heti limit';
+$lang['leavetype_limit_hint'] = 'pl home office';

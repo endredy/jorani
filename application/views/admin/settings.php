@@ -28,6 +28,10 @@
             <tr><td>ics_enabled</td><td><?php echo ($this->config->item('ics_enabled') ? 'TRUE':'FALSE'); ?></td></tr>
             <tr><td>default_timezone</td><td><?php echo $this->config->item('default_timezone'); ?></td></tr>
             <tr><td>public_calendar</td><td><?php echo ($this->config->item('public_calendar') ? 'TRUE':'FALSE'); ?></td></tr>
+            <tr><td>strictDate (end of the year is a hard limit: you can't request a leave on January of the next year)</td><td><?php echo ($this->config->item('strictDate') ? 'TRUE':'FALSE'); ?></td></tr>
+            <tr><td>hideZeroLeaveType (hide the leave type 0 (which is reserved for special purpose))</td><td><?php echo ($this->config->item('hideZeroLeaveType') ? 'TRUE':'FALSE'); ?></td></tr>
+            <tr><td>approveByAdmin (enable to approve special leave type by admin)</td><td><?php echo ($this->config->item('approveByAdmin') ? 'TRUE':'FALSE'); ?></td></tr>
+
           </tbody>
         </table>
 

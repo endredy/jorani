@@ -223,6 +223,9 @@ class Entitleddays_model extends CI_Model {
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
     public function detectOverflow() {
+        if (!$this->config->item('strictDate')){
+            return []; // esteve: if strictDate is off, it is legal :)
+        }
         //Note: the query below detects deletion problems:
         //SELECT * FROM entitleddays 
         //LEFT OUTER JOIN users ON entitleddays.employee = users.id 

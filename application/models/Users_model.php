@@ -32,12 +32,21 @@ class Users_model extends CI_Model {
         $this->db->select('users.*');
         if ($id === 0) {
             $query = $this->db->get('users');
-            return $query->result_array();
+            return array_map([$this, 'getJsonProperties'], $query->result_array());
         }
         $query = $this->db->get_where('users', array('users.id' => $id));
-        return $query->row_array();
+        return $this->getJsonProperties($query->row_array());
     }
 
+    /**
+     * @author esteve
+     */
+    public function getJsonProperties($user){
+        $json = json_decode($user['user_properties']);
+        $user['home_office_limit'] = $json->{'home_office_limit'} ?? '';
+        $user['birthday'] = $json->{'birthday'} ?? '';
+        return $user;
+    }
     /**
      * Get the list of users and their roles
      * @return array record of users
@@ -368,6 +377,21 @@ class Users_model extends CI_Model {
         }
         if ($this->config->item('ldap_basedn_db') !== FALSE) {
             $data['ldap_path'] = $this->input->post('ldap_path');
+        }
+        // perhaps this could be in a function
+        $properties = [];
+        if ($this->input->post('home_office_limit') != NULL && $this->input->post('home_office_limit') != ''){ // esteve
+            $properties['home_office_limit'] = $this->input->post('home_office_limit');
+//            $data['user_properties'] = json_encode(['home_office_limit' => $this->input->post('home_office_limit')]);
+        }
+        if ($this->input->post('birthday') != NULL && $this->input->post('birthday') != ''){ // esteve
+            $properties['birthday'] = $this->input->post('birthday');
+//            $tmp = json_decode($data['user_properties'], true);
+//            $tmp['birthday'] = $this->input->post('birthday');
+//            $data['user_properties'] = json_encode($tmp);
+        }
+        if (count($properties) > 0){
+            $data['user_properties'] = json_encode($properties);
         }
 
         $this->db->where('id', $this->input->post('id'));

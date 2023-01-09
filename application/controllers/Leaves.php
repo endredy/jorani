@@ -162,6 +162,7 @@ class Leaves extends CI_Controller {
             }
           }
         }
+        $this->load->model('organization_model'); // esteve
         $this->load->view('templates/header', $data);
         $this->load->view('menu/index', $data);
         $this->load->view('leaves/view', $data);
@@ -225,6 +226,8 @@ class Leaves extends CI_Controller {
             $data['defaultType'] = $leaveTypesDetails->defaultType;
             $data['credit'] = $leaveTypesDetails->credit;
             $data['types'] = $leaveTypesDetails->types;
+            $data['typesWithExtraInput'] = $this->types_model->getTypesWithExtraInput();
+            $data['typeDefs'] = $this->types_model->getTypes();
             $this->load->view('templates/header', $data);
             $this->load->view('menu/index', $data);
             $this->load->view('leaves/create');
@@ -253,6 +256,12 @@ class Leaves extends CI_Controller {
           if (function_exists('triggerCreateLeaveRequest')) {
               triggerCreateLeaveRequest($this);
           }
+          if ($this->leaves_model->isLeaveTypeWithoutApproval($this->input->post('type'))){
+              // this type should be saved approved state (e.g working in an external office) (esteve)
+              if ($this->input->post('status') >= LMS_REQUESTED)
+                  $_POST['status'] = LMS_ACCEPTED;
+          }
+
           $leave_id = $this->leaves_model->setLeaves($this->session->userdata('id'));
           $this->session->set_flashdata('msg', lang('leaves_create_flash_msg_success'));
 
@@ -265,6 +274,110 @@ class Leaves extends CI_Controller {
           } else {
               redirect('leaves');
           }
+        }
+    }
+
+    /**
+     * Create a leave request
+     * @author esteve
+     */
+    public function createEx() {
+//        echo 'most mentem: create';
+        $this->auth->checkIfOperationIsAllowed('create_leaves');
+        $data = getUserContext($this);
+        $this->load->helper('form');
+        $this->load->library('form_validation');
+        $data['title'] = lang('leaves_create_title');
+        $data['help'] = $this->help->create_help_link('global_link_doc_page_request_leave');
+
+        $this->form_validation->set_rules('startdate', lang('leaves_create_field_start'), 'required|strip_tags');
+        $this->form_validation->set_rules('startdatetype', 'Start Date type', 'required|strip_tags');
+        $this->form_validation->set_rules('enddate', lang('leaves_create_field_end'), 'required|strip_tags');
+        $this->form_validation->set_rules('enddatetype', 'End Date type', 'required|strip_tags');
+        $this->form_validation->set_rules('duration', lang('leaves_create_field_duration'), 'required|strip_tags');
+        $this->form_validation->set_rules('type', lang('leaves_create_field_type'), 'required|strip_tags');
+        $this->form_validation->set_rules('cause', lang('leaves_create_field_cause'), 'strip_tags');
+        $this->form_validation->set_rules('status', lang('leaves_create_field_status'), 'required|strip_tags');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->load->model('contracts_model');
+            $leaveTypesDetails = $this->contracts_model->getLeaveTypesDetailsOTypesForUser($this->session->userdata('id'));
+            $data['defaultType'] = $leaveTypesDetails->defaultType;
+            $data['credit'] = $leaveTypesDetails->credit;
+            $data['types'] = $leaveTypesDetails->types;
+            $data['typeDetails'] = $this->leaves_model->getLeaveTypeColors(); // esteve
+            $data['leaveLimits'] = $this->leaves_model->getLeaveTypeLimits(); // esteve
+            $data['events'] = $this->leaves_model->getLeavesOfEmployee($this->session->userdata('id'), NULL, date("Y-m-d", strtotime("-5 month")), date("Y-m-d", strtotime("+5 month")));
+            $data['typesWithExtraInput'] = $this->types_model->getTypesWithExtraInput();
+
+            $this->load->model('users_model');
+            $user = $this->users_model->getUsers($this->session->userdata('id'));
+            $entity = is_null($user['organization'])?0:$user['organization'];
+
+            $this->load->model('organization_model');
+            $employees = $this->organization_model->allEmployees($entity, false);
+
+            $data['allEvents'] = [];
+            foreach ($employees as $e) {
+                if ($e->id == $this->session->userdata('id')) continue;
+                $data['allEvents'][$e->lastname . ' ' . $e->firstname] =
+                    $this->leaves_model->getLeavesOfEmployee($e->id, NULL, date("Y-m-d", strtotime("-5 month")), date("Y-m-d", strtotime("+5 month")));
+            }
+//            $this->load->model('lists_model');
+//            $employees = $this->lists_model->getListOfEmployees($list);
+
+//            var_dump($employees);
+
+
+            $this->load->view('templates/header', $data);
+            $this->load->view('menu/index', $data);
+            $this->load->view('leaves/createEx');
+            $this->load->view('templates/footer');
+//            var_dump($data); // esteve
+//            var_dump($leaveTypesDetails);
+        } else {
+            //Prevent thugs to auto validate their leave requests
+            if (!$this->is_hr && !$this->is_admin) {
+                if ($this->input->post('status') > LMS_REQUESTED) {
+                    log_message('error', 'User #' . $this->session->userdata('id') .
+                        ' tried to submit a LR with an wrong status = ' . $this->input->post('status'));
+                    $_POST['status'] = LMS_REQUESTED;
+                }
+            }
+
+            //Users must use an existing leave type, otherwise
+            //force leave type to default leave type
+            $this->load->model('contracts_model');
+            $leaveTypesDetails = $this->contracts_model->getLeaveTypesDetailsOTypesForUser($this->session->userdata('id'));
+//            var_dump($leaveTypesDetails);
+            if (!array_key_exists($this->input->post('type'), $leaveTypesDetails->types)) {
+                log_message('error', 'User #' . $this->session->userdata('id') . ' tried to submit an wrong LR type = ' .
+                    $this->input->post('type'));
+                $_POST['type'] = $leaveTypesDetails->defaultType;
+                log_message('debug', 'LR type forced to ' . $leaveTypesDetails->defaultType);
+            }
+
+            if (function_exists('triggerCreateLeaveRequest')) {
+                triggerCreateLeaveRequest($this);
+            }
+            if ($this->leaves_model->isLeaveTypeWithoutApproval($this->input->post('type'))){
+                // this type should be saved approved state (e.g working in an external office) (esteve)
+                if ($this->input->post('status') >= LMS_REQUESTED)
+                    $_POST['status'] = LMS_ACCEPTED;
+            }
+
+            $leave_id = $this->leaves_model->setLeaves($this->session->userdata('id'));
+            $this->session->set_flashdata('msg', lang('leaves_create_flash_msg_success'));
+
+            //If the status is requested, send an email to the manager
+            if ($this->input->post('status') == LMS_REQUESTED) {
+                $this->sendMailOnLeaveRequestCreation($leave_id);
+            }
+            if (isset($_GET['source'])) {
+                redirect($_GET['source']);
+            } else {
+                redirect('leaves');
+            }
         }
     }
 

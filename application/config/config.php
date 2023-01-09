@@ -570,3 +570,13 @@ $config['enable_history'] = TRUE;
 $config['enable_apm_rum'] = FALSE;
 //Display navigation timing to user. You need a browser supporting WebTiming API
 $config['enable_apm_display'] = FALSE;
+
+
+// enable to request leave on next january (dont limit into a year)
+$config['strictDate'] = FALSE;
+
+// hide the leave type 0 (which is reserved for special purpose)
+$config['hideZeroLeaveType'] = TRUE;
+
+// enable to approve special leave type by admin (e.g. sick leave)
+$config['approveByAdmin'] = TRUE;
