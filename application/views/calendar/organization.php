@@ -308,7 +308,7 @@
             eventAfterRender: function(event, element, view) {
 
                 if (event.stateClass != ''){
-                    $(element).addClass(event.stateClass);
+                    $(element).find('.fc-title').addClass(event.stateClass).css({'padding-left': '15px', 'background-position': 'left'});
                 }
 
                 //Add tooltip to the element
