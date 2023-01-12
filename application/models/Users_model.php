@@ -42,7 +42,7 @@ class Users_model extends CI_Model {
      * @author esteve
      */
     public function getJsonProperties($user){
-        $json = json_decode($user['user_properties']);
+        $json = json_decode($user['user_properties'] ?? '');
         $user['home_office_limit'] = $json->{'home_office_limit'} ?? '';
         $user['birthday'] = $json->{'birthday'} ?? '';
         return $user;
