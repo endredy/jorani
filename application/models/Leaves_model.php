@@ -314,18 +314,15 @@ class Leaves_model extends CI_Model {
 
         $this->db->select('id, limit');
         $this->db->from('types');
-//        $this->db->join('parameters', 'parameters.entity_id = types.id', 'INNER');
         if ($type) {
             $this->db->where('name', $type);
         }
-//        $this->db->where('parameters.name', 'type_limit');
 
         $r = $this->db->get()->row_array();
-//        var_dump($r);
         if (!$r)
             return NULL; // we are ready, this type has no weekly limit
 
-//        csak akkor validalna, ha van kezdodatum. Jobb lenne az request gomb utan validalni, akkor biztos van datum.
+//        it would validate only it there is startDate. Suggestion: validate after request button is pushed (dates are filled).
 
         // has this user custom weekly limit?
         $this->load->model('users_model');
@@ -337,17 +334,18 @@ class Leaves_model extends CI_Model {
             return $r ? $r['limit'] : NULL;
         }
 
-        // we check that week, if this
-        $day = date('w');
-        $weekStart = date('Y-m-d', strtotime('-'.$day.' days'));
-        $weekEnd = date('Y-m-d', strtotime('+'.(6-$day).' days'));
+        $st = (new DateTime($startdate))->getTimestamp();
+        // we check that week, if the limit of this type has been reached
+        $day = date('w', $st);
+        $weekStart = date('Y-m-d', strtotime('-'.$day.' days', $st));
+        $weekEnd = date('Y-m-d', strtotime('+'.(6-$day).' days', $st));
         $l = $this->getLeavesOfEmployee($id, $r['id'], $weekStart, $weekEnd);
 //        ha mar ebbol a tipusbol vett ki a heten, az csokkenti!
         $taken = 0;
         foreach ($l as $row){
+            if ($row['status'] > 3) continue; // cancelled, etc doesn't matter
             $taken += floatval($row['duration']);
         }
-//        var_dump($startdate);
         $available = floatval($r['limit']) - $taken;
         return $available > 0 ? $available : 0;
     }
@@ -627,7 +625,7 @@ class Leaves_model extends CI_Model {
     public function detectOverlappingLeaves($id, $startdate, $enddate, $startdatetype, $enddatetype, $leave_id=NULL) {
         $overlapping = FALSE;
         $this->db->where('employee', $id);
-        $this->db->where('status != 4');
+        $this->db->where('status NOT IN ( 4, 5, 6)'); // rejected or cancellation or cancelled can't overlap
         $this->db->where('(startdate <= DATE(\'' . $enddate . '\') AND enddate >= DATE(\'' . $startdate . '\'))');
         if (!is_null($leave_id)) {
             $this->db->where('id != ', $leave_id);
