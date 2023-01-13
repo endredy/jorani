@@ -54,3 +54,18 @@ $lang['leavetypes_type_export_thead_id'] = 'ID';
 $lang['leavetypes_type_export_thead_name'] = 'Name';
 $lang['leavetypes_type_export_thead_acronym'] = 'Acronym';
 $lang['leavetypes_type_export_thead_deduct'] = 'Deduct non working days';
+
+$lang['leavetype_color'] = 'Color';
+$lang['leavetype_textcolor'] = 'Text color';
+$lang['leavetype_color_hint'] = 'e.g. in calendars';
+$lang['leavetype_nodeduction'] = 'No deduction';
+$lang['leavetype_nodeduction_hint'] = 'This type is independent from employee\'s paid leave (e.g. home office, sick leave, etc). This type of leave doesn\'t decrease days off.';
+$lang['leavetype_noapproval'] = 'No approval';
+$lang['leavetype_noapproval_hint'] = 'This type needs no approval (e.g. working in an external location)';
+$lang['leavetype_approve_by_admin'] = 'Approve by admin';
+$lang['leavetype_approve_by_admin_hint'] = 'This type is approved by admin (e.g. sick leave)';
+$lang['leavetype_extrainput'] = 'Extra input';
+$lang['leavetype_extrainput_hint'] = 'This type needs an extra input (e.g. name of external location)';
+$lang['leavetype_limit'] = 'Weekly limit';
+$lang['leavetype_limit_hint'] = 'e.g. home office';
+
