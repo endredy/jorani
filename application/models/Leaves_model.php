@@ -899,9 +899,9 @@ class Leaves_model extends CI_Model {
         if (isset($json_parsed)){
           array_push($json_parsed->comments, $comment_change);
         }else {
-          $json_parsed->comments = array($comment_change);
+            if ($json_parsed) $json_parsed->comments = array($comment_change);
         }
-        $json = json_encode($json_parsed);
+        $json = json_encode($json_parsed ?? '');
         $data = array(
             'status' => $status,
             'comments' => $json
