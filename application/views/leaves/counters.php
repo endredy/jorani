@@ -35,11 +35,16 @@
             <tbody>
             <?php if (count($summary) > 0) {
             foreach ($summary as $key => $value) {
+                $unlimited = isset($value['outOffice']) && $value['outOffice'];
                 if (($value[2] == '') || ($value[2] == 'x')) {
                     $estimated = round(((float) $value[1] - (float) $value[0]), 3, PHP_ROUND_HALF_DOWN);
                     $simulated = $estimated;
                     if (!empty($value[4])) $simulated -= (float) $value[4];
                     if (!empty($value[5])) $simulated -= (float) $value[5];
+                    if ($unlimited){
+                        $estimated = '-';
+                        $simulated = '-';
+                    }
                     ?>
                 <tr>
                 <td><?php echo $key; ?></td>
@@ -49,7 +54,7 @@
                 <td>
                     <?php echo $simulated; ?>
                 </td>
-                <td><?php echo ((float) $value[1]); ?></td>
+                <td><?php echo ($unlimited ? '-' : (float) $value[1]); ?></td>
                 <td><a href="<?php echo base_url();?>leaves?statuses=3|5&type=<?php echo $value[3]; ?>" target="_blank"><?php echo ((float) $value[0]); ?></a></td>
                 <?php if (empty($value[4])) { ?>
                 <td>&nbsp;</td>

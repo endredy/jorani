@@ -10,16 +10,22 @@
 $isCurrentYear = (int)date('Y') === (int)$year;
 $currentMonth = (int)date('m');
 $currentDay = (int)date('d');
+
+
+if (!isset($leaveColors)) {
+    $leaveColors = $this->leaves_model->getLeaveTypeStyle(); // esteve
+}
+echo $leaveColors;
 ?>
 
 <h2><?php echo lang('calendar_year_title');?>&nbsp;<span class="muted">(<?php echo $employee_name;?>)</span>&nbsp;<?php echo $help;?></h2>
 
 <div class="row-fluid">
     <div class="span4">
-        <span class="label"><?php echo lang('Planned');?></span>&nbsp;
-        <span class="label label-success"><?php echo lang('Accepted');?></span>&nbsp;
-        <span class="label label-warning"><?php echo lang('Requested');?></span>&nbsp;
-        <span class="label label-important" style="background-color: #ff0000;"><?php echo lang('Rejected');?></span>
+        <span class="label" style="background-color: grey"><span class="allplanned">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><?php echo lang('Planned');?></span> &nbsp;
+        <span class="label">&nbsp;<?php echo lang('Accepted');?></span> &nbsp;
+        <span class="label" style="background-color: grey">&nbsp;<span class="allrequested">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><?php echo lang('Requested');?></span> &nbsp;
+        <span class="label" style="background-color: grey">&nbsp;<span class="allrejected">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><?php echo lang('Cancellation');?></span> &nbsp;
 
         <span class="col-6"></span>
         <?php require_once ('legend.php'); ?>
@@ -73,6 +79,16 @@ $currentDay = (int)date('d');
                 $class .= ' currentday-border';
             }
 
+            // colors of each leave types (esteve)
+            if (isset($day->leaveTypeId)){
+                $css = ' leave';
+                if (strstr($day->leaveTypeId, ';') !== false){
+                    $css .= implode(' leave', explode(';', $day->leaveTypeId));
+                }else {
+                    $css .= $day->leaveTypeId;
+                }
+                $class .= $css;
+            }
             if (strstr($day->display, ';')) {//Two statuses in the cell
                 $periods = explode(";", $day->display);
                 $statuses = explode(";", $day->status);
@@ -127,7 +143,16 @@ $currentDay = (int)date('d');
             if($isCurrentDay){
                 $class .= ' currentday-border';
             }
-
+            // colors of each leave types (esteve)
+            if (isset($day->leaveTypeId)){
+                $css = ' leave';
+                if (strstr($day->leaveTypeId, ';') !== false){
+                    $css .= implode(' leave', explode(';', $day->leaveTypeId));
+                }else {
+                    $css .= $day->leaveTypeId;
+                }
+                $class .= $css;
+            }
             if (strstr($day->display, ';')) {//Two statuses in the cell
                 $periods = explode(";", $day->display);
                 $statuses = explode(";", $day->status);

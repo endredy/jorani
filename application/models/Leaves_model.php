@@ -262,8 +262,7 @@ class Leaves_model extends CI_Model {
         $this->db->join('types', 'types.id = entitleddays.type');
         $this->db->group_by('types.id');
         $this->db->where('entitleddays.startdate <= ', $refDate);
-        if ($this->config->item('strictDate'))
-            $this->db->where('entitleddays.enddate >= ', $refDate);
+        $this->db->where('entitleddays.enddate >= ', $this->config->item('strictDate') ? $refDate : (date('Y') + 1) . '-01-31');
         $where = ' (entitleddays.contract=' . $contract .
                        ' OR entitleddays.employee=' . $employee . ')';
         $this->db->where($where, NULL, FALSE);   //Not very safe, but can't do otherwise
@@ -523,6 +522,7 @@ class Leaves_model extends CI_Model {
                 //Report the number of available days
                 $summary[$entitlement['type_name']][3] = $entitlement['type_id'];
                 $summary[$entitlement['type_name']][1] = (float) $entitlement['entitled'];
+                $summary[$entitlement['type_name']]['outOffice'] = $this->isOutOfficeLeaveType($entitlement['type_name']);
             }
             
             //List all planned leaves in a third column
@@ -995,6 +995,8 @@ class Leaves_model extends CI_Model {
                 'start' => $startdate,
                 'color' => $entry->color ? $entry->color : $color,  //esteve
                 'textColor' => $entry->textcolor ? $entry->textcolor : 'white',  //esteve
+                'stateClass' => $this->getStateClass($entry->status), //esteve
+                'stateText' => $entry->status != LMS_ACCEPTED ? $this->getStateCaption($entry->status) : '', //esteve (accepted doesn't need icon)
                 'allDay' => $allDay,
                 'end' => $enddate,
                 'startdatetype' => $startdatetype,
@@ -1066,6 +1068,8 @@ class Leaves_model extends CI_Model {
                 'start' => $startdate,
                 'color' => $entry->color ? $entry->color : $color,  //esteve
                 'textColor' => $entry->textcolor ? $entry->textcolor : 'white',  //esteve
+                'stateClass' => $this->getStateClass($entry->status), //esteve
+                'stateText' => $entry->status != LMS_ACCEPTED ? $this->getStateCaption($entry->status) : '', //esteve (accepted doesn't need icon)
                 'allDay' => $allDay,
                 'end' => $enddate,
                 'startdatetype' => $startdatetype,

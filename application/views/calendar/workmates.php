@@ -17,9 +17,10 @@
 
 <div class="row-fluid">
     <div class="span4">
-        <span class="label"><?php echo lang('Planned');?></span>
-        <span class="label label-success"><?php echo lang('Accepted');?></span>
-        <span class="label label-warning"><?php echo lang('Requested');?></span>
+        <span class="label" style="background-color: grey"><span class="allplanned">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><?php echo lang('Planned');?></span> &nbsp;
+        <span class="label">&nbsp;<?php echo lang('Accepted');?></span> &nbsp;
+        <span class="label" style="background-color: grey">&nbsp;<span class="allrequested">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><?php echo lang('Requested');?></span> &nbsp;
+        <span class="label" style="background-color: grey">&nbsp;<span class="allrejected">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><?php echo lang('Cancellation');?></span> &nbsp;
     </div>
     <span class="col-6"><?php require_once ('legend.php'); ?></span>
 
@@ -83,8 +84,12 @@ $(document).ready(function() {
             }
         },
         eventAfterRender: function(event, element, view) {
+            if (event.stateClass != ''){
+                $(element).find('.fc-title').addClass(event.stateClass).css({'padding-left': '15px', 'background-position': 'left'});
+            }
+
             //Add tooltip to the element
-            $(element).attr('title', event.title);
+            $(element).attr('title', event.title + (event.stateText != ''  ? ' - ' + event.stateText : ''));
             
             if (event.enddatetype == "Morning" || event.startdatetype == "Afternoon") {
                 var nb_days = event.end.diff(event.start, "days");
