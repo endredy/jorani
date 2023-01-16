@@ -137,7 +137,7 @@
         {
             id: '<?=$e['id']?>',
             calendarId: '<?=$e['type']?>',
-            title: '<?=$e['cause']?>',
+            title: '<?=preg_replace('/[\n\r\']+/', ' ', $e['cause'])?>',
             category: 'allday', // time
             isAllday: true,
             isReadOnly: true,    // only planned can be modified, but it has no rest api
@@ -169,7 +169,7 @@
         {
             id: '<?=$e['id']?>',
             calendarId: '<?=$e['type']?>',
-            title: '<?=$u?>',
+            title: '<?=preg_replace('/[\n\r\']+/', ' ', $u)?>',
             category: 'allday', // time
             isAllday: true,
             isReadOnly: true,    // schedule is read-only
