@@ -262,7 +262,13 @@ class Leaves_model extends CI_Model {
         $this->db->join('types', 'types.id = entitleddays.type');
         $this->db->group_by('types.id');
         $this->db->where('entitleddays.startdate <= ', $refDate);
-        $this->db->where('entitleddays.enddate >= ', $this->config->item('strictDate') ? $refDate : (date('Y') + 1) . '-01-31');
+        $endDate = $refDate;
+//        if (!$this->config->item('strictDate')) {
+//            // if not strictDate => next januar is also acceptable
+//            $st = (new DateTime($refDate))->getTimestamp();
+//            $endDate = date('Y-m-d', strtotime('+1 month', $st));
+//        }
+        $this->db->where('entitleddays.enddate >= ', $endDate);
         $where = ' (entitleddays.contract=' . $contract .
                        ' OR entitleddays.employee=' . $employee . ')';
         $this->db->where($where, NULL, FALSE);   //Not very safe, but can't do otherwise
