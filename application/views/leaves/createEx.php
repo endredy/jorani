@@ -144,7 +144,7 @@
             dueDateClass: '',
             start: '<?=$e['startdate']?>',
             end: '<?=$e['enddate']?>',
-            raw: <?=$e['status']?>,
+            raw: <?=json_encode(['status' => (int)$e['status'], 'duration' => (float)$e['duration']])?>,
             <?php /* if ($e['status_name'] == 'Requested') { ?>
             customStyle: {
                 background: "repeating-linear-gradient(45deg, transparent, transparent 10px, #ccc 10px, #ccc 20px)"
@@ -271,7 +271,7 @@
 
     // https://stackoverflow.com/questions/37069186/calculate-working-days-between-two-dates-in-javascript-excepts-holidays
     function getWeekDays(start, end){
-        let _weekdays = [0,1,2,3,4];
+        let _weekdays = [1,2,3,4,5];
         var c=0;
         var currentDate = start.toDate();
         while (currentDate <= end) {
@@ -308,9 +308,9 @@
 
         for(k of cal.getStoreState().calendar.events.internalMap.values()){
 //            console.log(k);
-            if (k.raw === undefined) continue; // other user
-            if (k.calendarId == ev.calendarId && k.raw < 4){
-                const duration = k.start < k.end ? getWeekDays(k.start, k.end) : getWeekDays(k.end, k.start); // weekend?
+            if (k.raw === undefined || k.raw == null) continue; // other user
+            if (k.calendarId == ev.calendarId && k.raw.status < 4){
+                const duration = k.raw.duration; //k.start < k.end ? getWeekDays(k.start, k.end) : getWeekDays(k.end, k.start); // weekend?
                 const week = getWeekNumber(k.start);
                 if (week == currWeek) {
                     if (c[week] == undefined) c[week] = 0;
