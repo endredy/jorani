@@ -456,7 +456,7 @@ class Leaves_model extends CI_Model {
     public function getLeaveTypeStyle(){
         $r = '<style>';
         foreach($this->getLeaveTypeColors() as $i){
-            $r .= '.leave' . $i['id'] . ' {background-color: '.($i['color'] ? $i['color'] : 'white').'!important; color:'.($i['textcolor'] ? $i['textcolor'] : 'black').';}';
+            $r .= '.leave' . $i['id'] . ' {background-color: '.($i['color'] ? $i['color'] : 'white').'!important; color:'.($i['textcolor'] ? $i['textcolor'] : 'black').';--leavecolor' . $i['id'] . ':' .($i['color'] ? $i['color'] : 'white').';}';
         }
         $r .= '</style>';
         return $r;

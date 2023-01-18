@@ -14,6 +14,7 @@ if (!isset($leaveColors)) {
     $leaveColors = $this->leaves_model->getLeaveTypeStyle(); // esteve
 }
 echo $leaveColors;
+$css2add = [];
 ?>
 
 <?php
@@ -65,7 +66,6 @@ if (count($tabular) > 0) {?>
   
   foreach ($tabular as $employee) {
       $dayIterator = 0;
-      //echo var_dump($employee);
       ?>
     <tr>
       <td><?php echo $employee->name; ?></td>
@@ -101,14 +101,29 @@ if (count($tabular) > 0) {?>
                 }
                 //If we have two requests the same day (morning/afternoon)
                 if (($statuses[0] == $statuses[1]) && ($periods[0] != $periods[1])){
-                    switch (intval($statuses[0]))
-                    {
-                        case 1: $class = "allplanned"; break;  // Planned
-                        case 2: $class = "allrequested"; break;  // Requested
-                        case 3: $class = "allaccepted"; break;  // Accepted
-                        case 4: $class = "allrejected"; break;  // Rejected
-                        case 5: $class = "allrejected"; break;  // Cancellation
-                        case 6: $class = "allrejected"; break;  // Canceled
+                    $types = explode(";", $day->leaveTypeId);
+                    if ($types[0] == $types[1]){
+
+                        switch (intval($statuses[0]))
+                        {
+                            case 1: $class = "allplanned"; break;  // Planned
+                            case 2: $class = "allrequested"; break;  // Requested
+                            case 3: $class = "allaccepted"; break;  // Accepted
+                            case 4: $class = "allrejected"; break;  // Rejected
+                            case 5: $class = "allrejected"; break;  // Cancellation
+                            case 6: $class = "allrejected"; break;  // Canceled
+                        }
+                    }else{
+                        // different leave types on the same day
+                        $class = "mixed_" . $statuses[0] . '_' . $types[0] . '_' . $types[1];
+                        $img = 'cancel';
+                        switch (intval($statuses[0])){
+                            case 1: $img = 'question'; break;
+                            case 2: $img = 'requested'; break;
+                            case 3: $img = ''; break;
+                        }
+                        $css2add[$class] = '.'.$class.'{ background: '.($img != '' ? 'center no-repeat url("../assets/images/'.$img.'.png"),':'') .
+                            ' linear-gradient( 45deg, var(--leavecolor'.$types[0].'), var(--leavecolor'.$types[0].') 30px, var(--leavecolor'.$types[1].') 5px)}';
                     }
                 }
           } else {
@@ -326,3 +341,8 @@ $('.clickable').click(function(event){
     }
 });
 </script>
+
+<?php
+if (count($css2add) > 0) {
+    echo "<style>" . implode("\n", array_values($css2add)) . "</style>";
+}
