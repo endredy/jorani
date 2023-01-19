@@ -317,7 +317,7 @@ class Leaves_model extends CI_Model {
      */
     public function getUserAvailableDays($id, $type, $startdate = NULL){
 
-        $this->db->select('id, limit');
+        $this->db->select('id, limit, nodeduction');
         $this->db->from('types');
         if ($type) {
             $this->db->where('name', $type);
@@ -325,9 +325,14 @@ class Leaves_model extends CI_Model {
 
         $r = $this->db->get()->row_array();
         if (!$r)
-            return NULL; // we are ready, this type has no weekly limit
+            return NULL; // there is no such leave type
 
-//        it would validate only it there is startDate. Suggestion: validate after request button is pushed (dates are filled).
+        if ($r['limit'] == NULL && $r['nodeduction'] == 1){
+            return NULL; // unlimited leave type (sick leave, external office, etc), 'credit' will be NULL on pages
+        }
+
+        // from this point: this leave type has (weekly) limit OR it is paid leave (so it has a credit)
+        // it would validate only it there is startDate. Suggestion: validate after request button is pushed (dates are filled).
 
         // has this user custom weekly limit?
         $this->load->model('users_model');
