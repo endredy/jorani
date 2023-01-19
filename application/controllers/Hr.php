@@ -356,6 +356,8 @@ class Hr extends CI_Controller {
             $data['defaultType'] = $leaveTypesDetails->defaultType;
             $data['credit'] = $leaveTypesDetails->credit;
             $data['types'] = $leaveTypesDetails->types;
+            $data['typesWithExtraInput'] = $this->types_model->getTypesWithExtraInput();
+            $data['typeDefs'] = $this->types_model->getTypes();
             $this->load->model('users_model');
             $data['name'] = $this->users_model->getName($id);
             $this->load->view('templates/header', $data);
@@ -363,6 +365,13 @@ class Hr extends CI_Controller {
             $this->load->view('hr/createleave');
             $this->load->view('templates/footer');
         } else {
+
+            if ($this->leaves_model->isLeaveTypeWithoutApproval($this->input->post('type'))){
+                // this type should be saved approved state (e.g working in an external office) (esteve)
+                if ($this->input->post('status') >= LMS_REQUESTED)
+                    $_POST['status'] = LMS_ACCEPTED;
+            }
+
             $this->leaves_model->setLeaves($id);   //Return not used
             $this->session->set_flashdata('msg', lang('hr_leaves_create_flash_msg_success'));
             //No mail is sent, because the HR Officer would set the leave status to accepted
