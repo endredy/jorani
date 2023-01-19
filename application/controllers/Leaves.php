@@ -990,6 +990,7 @@ class Leaves extends CI_Controller {
         //Repeat start and end dates of the leave request
         $leaveValidator->RequestStartDate = $startdate;
         $leaveValidator->RequestEndDate = $enddate;
+        $leaveValidator->leaveTypeUnlimited = $this->leaves_model->isOutOfficeLeaveType($type);
 
         echo json_encode($leaveValidator);
     }

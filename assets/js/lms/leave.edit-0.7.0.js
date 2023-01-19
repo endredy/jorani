@@ -79,7 +79,8 @@ function getLeaveInfos(preventDefault) {
             if (typeof leaveInfo.credit !== 'undefined') {
                 var credit = parseFloat(leaveInfo.credit);
                 var duration = parseFloat($("#duration").val());
-                if (duration > credit) {
+                var unlimited = typeof leaveInfo.leaveTypeUnlimited !== 'undefined' ? leaveInfo.leaveTypeUnlimited : false;
+                if (!unlimited && duration > credit) {
                     $("#lblCreditAlert").show();
                 } else {
                     $("#lblCreditAlert").hide();
