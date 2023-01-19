@@ -306,6 +306,7 @@ class Requests extends CI_Controller {
             $this->load->helper('form');
             $this->load->library('form_validation');
             $data['title'] = lang('hr_leaves_create_title');
+            $data['help'] = $this->help->create_help_link('global_link_doc_page_request_leave');
             $data['form_action'] = 'requests/createleave/' . $id;
             $data['source'] = 'requests/collaborators';
             $data['employee'] = $id;

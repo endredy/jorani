@@ -1572,7 +1572,7 @@ msgid "Password"
 msgstr "Jelszó"
 
 msgid "Send me my password"
-msgstr "Küld el nekem a jelszót"
+msgstr "Küldd el nekem a jelszót"
 
 msgid "Are you sure that you want to reset your password?"
 msgstr "Biztosan vissza szeretnéd állítani a jelszavad?"
