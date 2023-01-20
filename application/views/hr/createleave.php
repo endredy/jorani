@@ -50,6 +50,9 @@ echo form_open($form_action, $attributes) ?>
 
     <span style="margin-left: 2px;position: relative;top: -5px;" id="spnDayType"></span>
 
+    <label for="extrainput" id="extrainputLabel"><?php echo $typesWithExtraInput['extrainput'];?></label>
+    <input type="text" name="extrainput" id="extrainput" value="<?php echo set_value('extrainput'); ?>" />
+
     <div class="alert hide alert-error" id="lblCreditAlert" onclick="$('#lblCreditAlert').hide();">
         <button type="button" class="close">&times;</button>
         <?php echo lang('hr_leaves_create_field_duration_message');?>
@@ -103,7 +106,6 @@ if ($language_code != 'en') { ?>
 <?php } ?>
 <script type="text/javascript" src="<?php echo base_url();?>assets/js/lms/leave.edit-0.7.0.js" type="text/javascript"></script>
 <script src="<?php echo base_url();?>assets/js/bootbox.min.js"></script>
-<script type="text/javascript" src="<?php echo base_url();?>assets/js/selectize.min.js"></script>
 <script>
 $(document).on("click", "#showNoneWorkedDay", function(e) {
   showListDayOffHTML();
@@ -153,6 +155,17 @@ function validate_form() {
 
 $(function () {
     //Selectize the leave type combo
-    $('#type').select2();
+    $('#type').select2().change(function () {
+        const id = $(this).find("option:selected").val();
+        toggleExtraInput(id);
+    }).change(); // esteve;
 });
+
+function toggleExtraInput(selectedTypeId){
+    if (selectedTypeId == <?=$typesWithExtraInput['id']?>){
+        $('#extrainputLabel,#extrainput').show();
+        $('#extrainputLabel').attr('required', 'required'); // if it is visible, it is mandatory
+    }else
+        $('#extrainputLabel,#extrainput').hide();
+}
 </script>
