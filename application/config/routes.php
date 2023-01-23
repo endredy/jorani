@@ -193,6 +193,7 @@ $route['leaves/counters/(:num)'] = 'leaves/counters/$1';
 $route['leaves/export'] = 'leaves/export';
 $route['leaves/create'] = 'leaves/create';
 $route['leaves/createEx'] = 'leaves/createEx'; // esteve
+$route['leaves/createM'] = 'leaves/createM'; // esteve
 $route['leaves/edit/(:num)'] = 'leaves/edit/$1';
 $route['leaves/request/(:num)'] = 'leaves/requestLeave/$1';
 $route['leaves/cancel/(:num)'] = 'leaves/cancel/$1';

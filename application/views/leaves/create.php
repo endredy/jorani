@@ -10,7 +10,8 @@
 
 <h2><?php echo lang('leaves_create_title');?> &nbsp;<?php echo $help;?></h2>
 
-<a href="createEx" class="btn btn-primary"><i class="mdi mdi-calendar" aria-hidden="true"></i> Grafikus felület :)</a></h4>
+<a href="createEx" class="btn btn-primary"><i class="mdi mdi-calendar" aria-hidden="true"></i> Grafikus felület</a>
+<a href="createM" class="btn btn-primary"><i class="mdi mdi-calendar" aria-hidden="true"></i> Éves</a>
 
 <div class="row-fluid">
     <div class="span8">
@@ -56,10 +57,8 @@ echo form_open('leaves/create', $attributes) ?>
 
     <span style="margin-left: 2px;position: relative;top: -5px;" id="spnDayType"></span>
 
-    <?php if (true) { ?>
-        <label for="extrainput" id="extrainputLabel"><?php echo $typesWithExtraInput['extrainput'];?></label>
-        <input type="text" name="extrainput" id="extrainput" value="<?php echo set_value('extrainput'); ?>" />
-    <?php }  ?>
+    <label for="extrainput" id="extrainputLabel"><?php echo $typesWithExtraInput['extrainput'];?></label>
+    <input type="text" name="extrainput" id="extrainput" value="<?php echo set_value('extrainput'); ?>" />
 
     <div class="alert hide alert-error" id="lblCreditAlert" onclick="$('#lblCreditAlert').hide();">
         <button type="button" class="close">&times;</button>

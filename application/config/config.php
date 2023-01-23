@@ -580,3 +580,6 @@ $config['hideZeroLeaveType'] = TRUE;
 
 // enable to approve special leave type by admin (e.g. sick leave)
 $config['approveByAdmin'] = TRUE;
+
+// which leave types can be requested on multiple request page. User can request home office on every Monday in April by one click. (E.g. "TRUE" means all types or "Home office;Sick leave")
+$config['leaveTypesAtMassRequest'] = 'Home office;Külső helyszín';//TRUE;

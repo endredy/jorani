@@ -282,7 +282,6 @@ class Leaves extends CI_Controller {
      * @author esteve
      */
     public function createEx() {
-//        echo 'most mentem: create';
         $this->auth->checkIfOperationIsAllowed('create_leaves');
         $data = getUserContext($this);
         $this->load->helper('form');
@@ -382,6 +381,61 @@ class Leaves extends CI_Controller {
     }
 
     /**
+     * Create multiple leave request
+     * @author esteve
+     */
+    public function createM(){
+
+        $this->auth->checkIfOperationIsAllowed('create_leaves');
+        $data = getUserContext($this);
+        $this->load->helper('form');
+        $this->load->library('form_validation');
+        $data['title'] = lang('leaves_create_title');
+
+        $this->load->language('calendar');
+
+        $data['days'] = [lang('Monday'), lang('Tuesday'), lang('Wednesday'),lang('Thursday'),lang('Friday')];
+
+        $this->form_validation->set_rules('month', lang('leaves_create_field_start'), 'required|strip_tags');
+        $this->form_validation->set_rules('day', lang('leaves_create_field_start'), 'required|strip_tags');
+        $this->form_validation->set_rules('type', lang('leaves_create_field_type'), 'required|strip_tags');
+
+        if ($this->form_validation->run() === FALSE) {
+
+            $this->load->model('contracts_model');
+            $leaveTypesDetails = $this->contracts_model->getLeaveTypesDetailsOTypesForUser($this->session->userdata('id'));
+            // all types can be requested:
+            $tmp = $this->config->item('leaveTypesAtMassRequest');
+            if ($tmp === TRUE) {
+                $data['defaultType'] = $leaveTypesDetails->defaultType;
+                $data['types'] = $leaveTypesDetails->types;
+            }else {
+                // only spec type are allowed to request for all year
+                $allowedTypes = [];
+                $defId = -1;
+                foreach ($leaveTypesDetails->types as $id => $name) {
+                    if (stripos($tmp, $name) !== false) {
+                        $allowedTypes[$id] = $name;
+                        if ($defId != -1)
+                            $defId = $id;
+                    }
+                }
+                $data['defaultType'] = $defId;
+                $data['types'] = $allowedTypes;
+            }
+            $data['typesWithExtraInput'] = $this->types_model->getTypesWithExtraInput();
+            $data['typeDefs'] = $this->types_model->getTypes();
+
+            $this->load->view('templates/header', $data);
+            $this->load->view('menu/index', $data);
+            $this->load->view('leaves/createM');
+            $this->load->view('templates/footer');
+        }else{
+//            echo "elkuldted";
+//            var_dump($_REQUEST);
+        }
+    }
+        /**
      * Edit a leave request
      * @param int $id Identifier of the leave request
      * @author Benjamin BALET <benjamin.balet@gmail.com>
@@ -990,7 +1044,6 @@ class Leaves extends CI_Controller {
         //Repeat start and end dates of the leave request
         $leaveValidator->RequestStartDate = $startdate;
         $leaveValidator->RequestEndDate = $enddate;
-        $leaveValidator->leaveTypeUnlimited = $this->leaves_model->isOutOfficeLeaveType($type);
 
         echo json_encode($leaveValidator);
     }
