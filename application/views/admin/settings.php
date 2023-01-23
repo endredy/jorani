@@ -31,6 +31,7 @@
             <tr><td>strictDate (end of the year is a hard limit: you can't request a leave on January of the next year)</td><td><?php echo ($this->config->item('strictDate') ? 'TRUE':'FALSE'); ?></td></tr>
             <tr><td>hideZeroLeaveType (hide the leave type 0 (which is reserved for special purpose))</td><td><?php echo ($this->config->item('hideZeroLeaveType') ? 'TRUE':'FALSE'); ?></td></tr>
             <tr><td>approveByAdmin (enable to approve special leave type by admin)</td><td><?php echo ($this->config->item('approveByAdmin') ? 'TRUE':'FALSE'); ?></td></tr>
+            <tr><td>leaveTypesAtMassRequest (which leave types can be requested on multiple request page)</td><td><?php echo ($this->config->item('leaveTypesAtMassRequest') === TRUE ? 'TRUE':$this->config->item('leaveTypesAtMassRequest')); ?></td></tr>
 
           </tbody>
         </table>
