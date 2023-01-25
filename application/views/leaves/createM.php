@@ -55,6 +55,7 @@ echo form_open('leaves/createM', $attributes) ?>
     var userId = <?php echo $user_id; ?>;
     var selectedDates = [];
     var progress = 0;
+    var reqList = [];
 
     $(function(){$('#month,#day').click(function(){calc();})});
     function calc(){
@@ -158,7 +159,7 @@ echo form_open('leaves/createM', $attributes) ?>
         updateProgress();
         var comment = $('textarea[name=cause]').val(), cId = $("#type").val();
         for(q=0; q<selectedDates.length; q++) {
-            const d = {
+            reqList.push({
                 csrf_test_jorani: getCookie('<?php echo $this->config->item('csrf_cookie_name');?>'), //'3d338ba32d600883701b07478dded5d5',
                 type: cId,
                 viz_startdate: moment(selectedDates[q][0]).format('MM/DD/YYYY'), // 11%2F23%2F2022
@@ -171,18 +172,32 @@ echo form_open('leaves/createM', $attributes) ?>
                 extrainput: '',
                 cause: comment,
                 status: 2
-            }
-            // console.log(baseURL + "leaves/create" + " " + JSON.stringify(d));
-
-            $.ajax({
-                type: "POST",
-                url: baseURL + "leaves/create",
-                data: d
-            }).done(function (d) {
-                console.log('lementettuk a joraniba');
-                progress++;
-                updateProgress();
             });
+            // console.log(baseURL + "leaves/create" + " " + JSON.stringify(d));
         }
+        procQueue();
+    }
+
+    function procQueue() {
+
+        // terminate if array exhausted
+        if (reqList.length === 0)
+            return;
+
+        // pop top value
+        var d = reqList[0];
+        reqList.shift();
+
+        // ajax request
+        $.ajax({
+            type: "POST",
+            url: baseURL + "leaves/create",
+            data: d
+        }).done(function (d) {
+            console.log('lementettuk a joraniba');
+            progress++;
+            updateProgress();
+            procQueue(); // next request
+        });
     }
 </script>
