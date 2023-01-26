@@ -33,9 +33,9 @@ $sheet->setCellValue('A1', $fullname);
 
 $line = 4;
 foreach ($leaves as $leave) {
-    $date = new DateTime($leave['startdate']);
+    $date = new DateTime($leave['startdate'] ?? '');
     $startdate = $date->format(lang('global_date_format'));
-    $date = new DateTime($leave['enddate']);
+    $date = new DateTime($leave['enddate'] ?? '');
     $enddate = $date->format(lang('global_date_format'));
     $sheet->setCellValue('A' . $line, $leave['id']);
     $sheet->setCellValue('B' . $line, lang($leave['status_name']));

@@ -105,7 +105,7 @@ class Reports extends CI_Controller {
             $result[$user->id]['identifier'] = $user->identifier;
             $result[$user->id]['firstname'] = $user->firstname;
             $result[$user->id]['lastname'] = $user->lastname;
-            $date = new DateTime($user->datehired);
+            $date = new DateTime($user->datehired ?? '');
             $result[$user->id]['datehired'] = $date->format(lang('global_date_format'));
             $result[$user->id]['department'] = $user->department;
             $result[$user->id]['position'] = $user->position;
@@ -247,7 +247,7 @@ class Reports extends CI_Controller {
             $result[$user->id]['identifier'] = $user->identifier;
             $result[$user->id]['firstname'] = $user->firstname;
             $result[$user->id]['lastname'] = $user->lastname;
-            $date = new DateTime($user->datehired);
+            $date = new DateTime($user->datehired ?? '');
             $result[$user->id]['datehired'] = $date->format(lang('global_date_format'));
             $result[$user->id]['department'] = $user->department;
             $result[$user->id]['position'] = $user->position;
@@ -333,9 +333,9 @@ class Reports extends CI_Controller {
                     $tbody .= '<tbody>';
                     //Iterate on leave requests
                     foreach ($leave_requests[$user_id] as $request) {
-                        $date = new DateTime($request['startdate']);
+                        $date = new DateTime($request['startdate'] ?? '');
                         $startdate = $date->format(lang('global_date_format'));
-                        $date = new DateTime($request['enddate']);
+                        $date = new DateTime($request['enddate'] ?? '');
                         $enddate = $date->format(lang('global_date_format'));
                         $tbody .= '<tr>';
                         $tbody .= '<td><a href="' . base_url() . 'leaves/view/'. $request['id']. '" target="_blank">'. $request['id']. '</a></td>';

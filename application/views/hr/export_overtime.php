@@ -33,7 +33,7 @@ $sheet->setCellValue('A1', $fullname);
 
 $line = 4;
 foreach ($requests as $request) {
-    $date = new DateTime($request['date']);
+    $date = new DateTime($request['date'] ?? '');
     $startdate = $date->format(lang('global_date_format'));
     $sheet->setCellValue('A' . $line, $request['id']);
     $sheet->setCellValue('B' . $line, lang($request['status_name']));

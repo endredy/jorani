@@ -27,7 +27,7 @@
     </thead>
     <tbody>
 <?php foreach ($extras as $extra):
-    $date = new DateTime($extra['date']);
+    $date = new DateTime($extra['date'] ?? '');
     $tmpDate = $date->getTimestamp();
     $date = $date->format(lang('global_date_format'));?>
     <tr>
