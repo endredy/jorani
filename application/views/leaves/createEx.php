@@ -185,12 +185,6 @@
         <?php } } ?>
     ]);
 
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-    }
-
     var baseURL = '<?php echo base_url();?>';
     cal.on('beforeCreateEvent', (e) => {
         // Calling the instance method when the instance event is invoked
@@ -213,13 +207,13 @@
             type: "POST",
             url: baseURL + "leaves/create",
             data:  {
-                csrf_test_jorani: getCookie('<?php echo $this->config->item('csrf_cookie_name');?>'), //'3d338ba32d600883701b07478dded5d5',
+                csrf_test_jorani: '<?php echo $_COOKIE[$this->config->item('csrf_cookie_name')];?>',
                 type: e.calendarId,
-                viz_startdate: moment(e.start.toDate()).format('MM/DD/YYYY'), // 11%2F23%2F2022
+                viz_startdate: moment(e.start.toDate()).format('MM/DD/YYYY'),
                 startdate: moment(e.start.toDate()).format('YYYY-MM-DD'),
                 startdatetype: 'Morning',
-                viz_enddate: moment(e.end.toDate()).format('MM/DD/YYYY'), //'11%2F24%2F2022',
-                enddate: moment(e.end.toDate()).format('YYYY-MM-DD'), //'2022-11-24',
+                viz_enddate: moment(e.end.toDate()).format('MM/DD/YYYY'),
+                enddate: moment(e.end.toDate()).format('YYYY-MM-DD'),
                 enddatetype: 'Afternoon',
                 duration: moment(e.end.toDate()).diff(moment(e.start.toDate()), 'days')+1,
                 extrainput:'',

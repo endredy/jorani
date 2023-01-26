@@ -128,12 +128,6 @@ echo form_open('leaves/createM', $attributes) ?>
         return result;
     }
 
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-    }
-
     function updateProgress(){
         var h = '';
         if (progress < selectedDates.length){
@@ -160,13 +154,13 @@ echo form_open('leaves/createM', $attributes) ?>
         var comment = $('textarea[name=cause]').val(), cId = $("#type").val();
         for(q=0; q<selectedDates.length; q++) {
             reqList.push({
-                csrf_test_jorani: getCookie('<?php echo $this->config->item('csrf_cookie_name');?>'), //'3d338ba32d600883701b07478dded5d5',
+                csrf_test_jorani: '<?php echo $_COOKIE[$this->config->item('csrf_cookie_name')];?>',
                 type: cId,
-                viz_startdate: moment(selectedDates[q][0]).format('MM/DD/YYYY'), // 11%2F23%2F2022
+                viz_startdate: moment(selectedDates[q][0]).format('MM/DD/YYYY'),
                 startdate: moment(selectedDates[q][0]).format('YYYY-MM-DD'),
                 startdatetype: 'Morning',
-                viz_enddate: moment(selectedDates[q][1]).format('MM/DD/YYYY'), //'11%2F24%2F2022',
-                enddate: moment(selectedDates[q][1]).format('YYYY-MM-DD'), //'2022-11-24',
+                viz_enddate: moment(selectedDates[q][1]).format('MM/DD/YYYY'),
+                enddate: moment(selectedDates[q][1]).format('YYYY-MM-DD'),
                 enddatetype: 'Afternoon',
                 duration: moment(selectedDates[q][1]).diff(moment(selectedDates[q][0]), 'days') + 1,
                 extrainput: '',
