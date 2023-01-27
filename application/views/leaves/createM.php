@@ -46,7 +46,8 @@ echo form_open('leaves/createM', $attributes) ?>
         </tr>
     </table>
 
-    <button name="reqId" value="2" type="button" onclick="req()" class="btn btn-primary" title="A kiválasztott dátumokat beküldi, mintha egyesével foglaltad volna :)"><i class="mdi mdi-check"></i>&nbsp; <?php echo lang('Requested');?></button>
+    <input type="hidden" name="dates" id="dates" value=""/>
+    <button name="reqId" value="2" type="button" onclick="req(this.form)" class="btn btn-primary" title="A kiválasztott dátumokat beküldi, mintha egyesével foglaltad volna :)"><i class="mdi mdi-check"></i>&nbsp; <?php echo lang('Requested');?></button>
 
 </form>
 
@@ -140,7 +141,7 @@ echo form_open('leaves/createM', $attributes) ?>
         $('#progress').html(h);
     }
 
-    function req(){
+    function req(f){
 
         var t = $("#type").val(), m = $("#month").val(), d = $("#day").val();
         if (t == undefined || d == null || m == null || m.length == 0 || d.length == 0){
@@ -149,17 +150,12 @@ echo form_open('leaves/createM', $attributes) ?>
         }
 
         $('button[name=reqId]').prop('disabled', true);
-        progress = 0;
-        updateProgress();
         var comment = $('textarea[name=cause]').val(), cId = $("#type").val();
         for(q=0; q<selectedDates.length; q++) {
             reqList.push({
-                csrf_test_jorani: '<?php echo $_COOKIE[$this->config->item('csrf_cookie_name')];?>',
                 type: cId,
-                viz_startdate: moment(selectedDates[q][0]).format('MM/DD/YYYY'),
                 startdate: moment(selectedDates[q][0]).format('YYYY-MM-DD'),
                 startdatetype: 'Morning',
-                viz_enddate: moment(selectedDates[q][1]).format('MM/DD/YYYY'),
                 enddate: moment(selectedDates[q][1]).format('YYYY-MM-DD'),
                 enddatetype: 'Afternoon',
                 duration: moment(selectedDates[q][1]).diff(moment(selectedDates[q][0]), 'days') + 1,
@@ -169,29 +165,8 @@ echo form_open('leaves/createM', $attributes) ?>
             });
             // console.log(baseURL + "leaves/create" + " " + JSON.stringify(d));
         }
-        procQueue();
-    }
 
-    function procQueue() {
-
-        // terminate if array exhausted
-        if (reqList.length === 0)
-            return;
-
-        // pop top value
-        var d = reqList[0];
-        reqList.shift();
-
-        // ajax request
-        $.ajax({
-            type: "POST",
-            url: baseURL + "leaves/create",
-            data: d
-        }).done(function (d) {
-            console.log('lementettuk a joraniba');
-            progress++;
-            updateProgress();
-            procQueue(); // next request
-        });
+        $('#dates').val(JSON.stringify(reqList)); //{data:
+        f.submit();
     }
 </script>

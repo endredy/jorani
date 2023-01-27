@@ -431,8 +431,38 @@ class Leaves extends CI_Controller {
             $this->load->view('leaves/createM');
             $this->load->view('templates/footer');
         }else{
-//            echo "elkuldted";
-//            var_dump($_REQUEST);
+
+            // form submitted
+            $d = json_decode($_REQUEST['dates']);
+            $userId = $this->session->userdata('id');
+            $firstId = NULL;
+            $email = NULL;
+            $typeInfo = [];
+
+            foreach($d as $i) {
+
+                if (!isset($typeInfo[$i->type])){
+                    $typeInfo[$i->type] = $this->types_model->getTypes($i->type);
+                }
+                if ($email === NULL){
+                    $email = !($typeInfo[$i->type]['noapproval'] == 1);
+                }
+                //Prevent thugs to auto validate their leave requests
+                if ($i->status > LMS_REQUESTED) {
+                    $i->status = LMS_REQUESTED;
+                }
+                $leave_id = $this->leaves_model->createLeaveByApi($i->startdate, $i->enddate, $i->status, $userId,
+                    $i->cause,
+                    $i->startdatetype, $i->enddatetype, $i->duration, $i->type);
+                if ($firstId == NULL)
+                    $firstId = $leave_id;
+            }
+
+            //If the status is requested, send _one_ email to the manager
+            if ($email) {
+                $this->sendMailOnLeaveRequestCreation($firstId);
+            }
+            redirect('leaves');
         }
     }
         /**
