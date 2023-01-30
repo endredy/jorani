@@ -441,6 +441,11 @@ class Leaves extends CI_Controller {
 
             foreach($d as $i) {
 
+                // only if it doesn't overlap or collide with other request(s)
+                if ($this->leaves_model->detectOverlappingLeaves($userId, $i->startdate, $i->enddate, $i->startdatetype, $i->enddatetype)){
+                    continue;
+                }
+
                 if (!isset($typeInfo[$i->type])){
                     $typeInfo[$i->type] = $this->types_model->getTypes($i->type);
                 }
