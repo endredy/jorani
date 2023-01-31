@@ -36,11 +36,10 @@
 
 <link href="<?php echo base_url();?>assets/datatable/DataTables-1.10.11/css/jquery.dataTables.min.css" rel="stylesheet">
 <link href="<?php echo base_url();?>assets/datatable/Select-1.1.2/css/select.dataTables.min.css" rel="stylesheet">
-<script type="text/javascript" src="<?php echo base_url();?>assets/datatable/DataTables-1.10.11/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="<?php echo base_url();?>assets/datatable/Select-1.1.2/js/dataTables.select.min.js"></script>
-
 <script type="text/javascript">
 $(document).ready(function() {
+    $.getScript("<?php echo base_url();?>assets/datatable/DataTables-1.10.11/js/jquery.dataTables.min.js", function() {
+    $.getScript("<?php echo base_url();?>assets/datatable/Select-1.1.2/js/dataTables.select.min.js", function() {
     //Transform the HTML table in a fancy datatable
     $('#employees').dataTable({
         select: 'single',
@@ -71,5 +70,6 @@ $(document).ready(function() {
     });
     //Hide pagination select box in order to save space
     $('.dataTables_length').css("display", "none");
+});});
 });
 </script>
