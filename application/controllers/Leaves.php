@@ -648,7 +648,14 @@ class Leaves extends CI_Controller {
         //We load everything from DB as the LR can be edited from HR/Employees
         $leave = $this->leaves_model->getLeaves($id);
         $user = $this->users_model->getUsers($leave['employee']);
-        $manager = $this->users_model->getUsers($user['manager']);
+        $type = $this->types_model->getTypes($leave['type']);
+        if ($type['approvebyadmin']){
+            // this type is approved by admin (e.g. sick leave)
+            $manager = ['email' => $this->config->item('approveByAdmin'), 'id' => 0, 'language' => $user['language']];
+        }else {
+            // classic: approved by manager
+            $manager = $this->users_model->getUsers($user['manager']);
+        }
         if (empty($manager['email'])) {
             $this->session->set_flashdata('msg', lang('leaves_create_flash_msg_error'));
         } else {

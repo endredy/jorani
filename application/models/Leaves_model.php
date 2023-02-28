@@ -1433,7 +1433,7 @@ class Leaves_model extends CI_Model {
         } else {
             $this->db->where('(users.manager', $manager);
         }
-        if ($this->config->item('approveByAdmin')) {
+        if ($this->config->item('approveByAdmin') !== FALSE) {
             if ($this->session->userdata('is_admin') === TRUE)
                 $this->db->or_where("types.approvebyadmin = 1");
             else
@@ -1484,7 +1484,7 @@ class Leaves_model extends CI_Model {
         $query .= " WHERE (users.manager = $manager";
       }
 
-      if ($this->config->item('approveByAdmin')) {
+      if ($this->config->item('approveByAdmin') !== FALSE) {
           $query .= $this->session->userdata('is_admin') === TRUE ? " OR types.approvebyadmin = 1)" : " AND !(types.approvebyadmin <=> 1))"; // $manager == 2 esteve: sick leave is accepted by admin
       }else
           $query .= ")";
@@ -1517,7 +1517,7 @@ class Leaves_model extends CI_Model {
             $this->db->where('(users.manager', $manager);
         }
 
-        if ($this->config->item('approveByAdmin')) {
+        if ($this->config->item('approveByAdmin') !== FALSE) {
             $this->db->join('types', 'leaves.type = types.id');
             if ($this->session->userdata('is_admin') === TRUE)
                 $this->db->or_where("types.approvebyadmin = 1"); // nicer but OR kills the other conditions :(
