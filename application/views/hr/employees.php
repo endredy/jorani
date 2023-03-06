@@ -521,6 +521,8 @@ $(function () {
     //Handle links clicked into the context menu popup
     function handleLinksInContextMenu(e) {
         id = $(e.target).closest("tr").find('td:eq(0)').text();
+        if (id === '')
+            return;
         $("#frmContextMenu").modal('show');
         $('.context').each(function() {
             action =  $(this).attr( 'href');
