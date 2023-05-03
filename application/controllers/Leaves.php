@@ -163,6 +163,7 @@ class Leaves extends CI_Controller {
           }
         }
         $this->load->model('organization_model'); // esteve
+        $this->load->language('requests_lang'); // esteve (for accept button)
         $this->load->view('templates/header', $data);
         $this->load->view('menu/index', $data);
         $this->load->view('leaves/view', $data);

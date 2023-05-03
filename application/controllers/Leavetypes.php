@@ -90,7 +90,7 @@ class LeaveTypes extends CI_Controller {
             $this->types_model->updateTypes($id,
                     $this->input->post('name'),
                     $this->input->post('deduct_days_off'),
-                    mb_substr($this->input->post('acronym')),
+                    mb_substr($this->input->post('acronym'), 0, 2),
                     $this->input->post('nodeduction'),
                     $this->input->post('noapproval'),
                     $this->input->post('approvebyadmin'),

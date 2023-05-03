@@ -66,6 +66,9 @@ switch ($leave['status']) {
     <a href="<?php echo base_url();?>leaves/edit/<?php echo $leave['id'] ?>" class="btn btn-primary"><i class="mdi mdi-pencil"></i>&nbsp;<?php echo lang('leaves_view_button_edit');?></a>
     &nbsp;
     <?php } ?>
+    <?php if (($leave['status'] == LMS_REQUESTED) && ($is_hr)) { ?>
+        <a href="<?php echo base_url();?>requests/accept/<?php echo $leave['id'] ?>" class="btn btn-primary"><i class="mdi mdi-check"></i>&nbsp;<?php echo lang('requests_index_thead_tip_accept');?></a>&nbsp;
+    <?php } ?>
     <a href="<?php echo base_url() . $source; ?>" class="btn btn-primary"><i class="mdi mdi-arrow-left-bold"></i>&nbsp;<?php echo lang('leaves_view_button_back_list');?></a>
 
     </div>
