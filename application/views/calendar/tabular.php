@@ -55,7 +55,7 @@
         <span class="label label-important " style="background-color: grey"><input type="checkbox" checked id="chkCancellation" class="filterStatus"> <span class="allrejected">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;<?php echo lang('Cancellation');?></span> &nbsp;
 
         <span class="col-6"></span>
-        <?php require_once ('legend.php'); ?>
+        <?php $legendWithCheckbox = 1; require_once ('legend.php'); ?>
     </div>
 </div>
 
@@ -177,7 +177,12 @@
         if ($("#chkCancellation").prop("checked")) statuses+="5|";
         statuses = statuses.replace(/\|*$/, "");
         if (statuses!="") statuses = '?statuses=' + statuses;
-        return statuses;
+
+        tf = [];
+        for(var i=6; i<12; i++){
+            if ($("#chk"+i).prop("checked")) tf.push(i);
+        }
+        return statuses + (statuses!="" ? "&" : "?") + 'types=' + tf.join("|");
     }
 
     // Reload the partial view containing the tabular calendar

@@ -1170,7 +1170,7 @@ class Leaves_model extends CI_Model {
      * @return string JSON encoded list of full calendar events
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function department($entity_id, $start = "", $end = "", $children = FALSE, $statusFilter = NULL) {
+    public function department($entity_id, $start = "", $end = "", $children = FALSE, $statusFilter = NULL, $typesFilter = NULL) {
         $this->db->select('users.firstname, users.lastname, users.manager');
         $this->db->select('leaves.*');
         $this->db->select('types.name as type, types.acronym as acronym, types.color, types.textcolor');
@@ -1197,6 +1197,10 @@ class Leaves_model extends CI_Model {
         if ($statusFilter != NULL) {
             $statuses = explode ('|', $statusFilter);
             $this->db->where_in('status', $statuses );
+        }
+        if ($typesFilter !== NULL) { // if not empty (but NULL), then we should skip this condition (e.g department calendar)
+            $types = explode ('|', $typesFilter);
+            $this->db->where_in('leaves.type', $types );
         }
         $this->db->order_by('startdate', 'desc');
         $this->db->limit(1024);  //Security limit
@@ -1581,7 +1585,7 @@ class Leaves_model extends CI_Model {
      * @return array Array of objects containing leave details
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function tabular(&$entity=-1, &$month=0, &$year=0, &$children=TRUE, $statusFilter=NULL, $calendar=FALSE) {
+    public function tabular(&$entity=-1, &$month=0, &$year=0, &$children=TRUE, $statusFilter=NULL, $calendar=FALSE, $typesFilter = NULL) {
         //Find default values for parameters (passed by ref)
         if ($month==0) $month = date("m");
         if ($year==0) $year = date("Y");
@@ -1613,10 +1617,11 @@ class Leaves_model extends CI_Model {
                         in_array("4", $statuses),
                         in_array("5", $statuses),
                         in_array("6", $statuses),
-                        $calendar);
+                        $calendar,
+                        $typesFilter);
             } else {
                 $tabular[$employee->id] = $this->linear($employee->id, $month, $year,
-                        TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, $calendar);
+                        TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, $calendar, $typesFilter);
             }
         }
         return $tabular;
@@ -1727,7 +1732,7 @@ class Leaves_model extends CI_Model {
     public function linear($employee_id, $month, $year,
             $planned = FALSE, $requested = FALSE, $accepted = FALSE,
             $rejected = FALSE, $cancellation = FALSE, $canceled = FALSE,
-            $calendar = FALSE) {
+            $calendar = FALSE, $typesFilter = NULL) {
         $start = $year . '-' . $month . '-' .  '1';    //first date of selected month
         $lastDay = date("t", strtotime($start));    //last day of selected month
         $end = $year . '-' . $month . '-' . $lastDay;    //last date of selected month
@@ -1777,6 +1782,11 @@ class Leaves_model extends CI_Model {
         if (!$rejected) $this->db->where('leaves.status != ', LMS_REJECTED);
         if (!$cancellation) $this->db->where('leaves.status != ', LMS_CANCELLATION);
         if (!$canceled) $this->db->where('leaves.status != ', LMS_CANCELED);
+
+        if ($typesFilter !== NULL) {
+            $types = explode('|', $typesFilter);
+            $this->db->where_in('leaves.type', $types);
+        }
 
         $this->db->where('leaves.employee = ', $employee_id);
         $this->db->order_by('startdate', 'asc');
