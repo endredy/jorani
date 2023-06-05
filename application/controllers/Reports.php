@@ -116,10 +116,12 @@ class Reports extends CI_Controller {
                 $result[$user->id][$type['name']] = '';
             }
 
+            // add simulated column
+            $extra = lang('leaves_summary_thead_simulated');
+            $result[$user->id] = array_slice($result[$user->id], 0, 7, TRUE) + [$extra => ''] + array_slice($result[$user->id], 7, NULL, TRUE); // new column after contract
+
             $summary = $this->leaves_model->getLeaveBalanceForEmployee($user->id, TRUE, $refDate);
             if (!is_null($summary)) {
-                $extra = lang('leaves_summary_thead_simulated');
-                $result[$user->id] = array_slice($result[$user->id], 0, 7, TRUE) + [$extra => ''] + array_slice($result[$user->id], 7, NULL, TRUE); // new column after contract
               if (count($summary) > 0 ) {
                   foreach ($summary as $key => $value) {
                       $result[$user->id][$key] = round($value[1] - $value[0], 3, PHP_ROUND_HALF_DOWN);
@@ -130,12 +132,14 @@ class Reports extends CI_Controller {
                         3: type id
                         4: planned
                         5: requested
+
+                        simulated: "Entitled - (Accepted + Cancellation + Planned + Requested)"
                        */
-                      if ($value[3] !== '6') continue;
+                      if ($value[3] != '6') continue;
                       if (isset($result[$user->id][$extra]) && $result[$user->id][$extra] !== '') {
                           $result[$user->id][$extra] -= $value[4] ?? 0;
                       }else{
-                          $result[$user->id][$extra] = $value[1] - $value[0] - ($value[4] ?? 0);
+                          $result[$user->id][$extra] = $value[1] - ($value[0] + ($value[4] ?? 0) + ($value[5] ?? 0));
                       }
                   }
               }
