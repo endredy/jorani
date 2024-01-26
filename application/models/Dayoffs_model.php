@@ -362,6 +362,8 @@ class Dayoffs_model extends CI_Model {
         } else {
             $this->db->where('organization.id', $entity_id);
         }
+        if ($this->session->userdata('is_hr') === FALSE || (!isset($_COOKIE['dayOffAll']) || $_COOKIE['dayOffAll'] == 'false'))
+            $this->db->like('contracts.name', '40 órás'); // $this->db->where('contracts.id', 2);  // only HR can see all half time contracts (esteve)
 
         $events = $this->db->get('dayoffs')->result();
 

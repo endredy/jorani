@@ -52,6 +52,11 @@
 
         <span class="col-6"></span>
         <?php $legendWithCheckbox = 1; require_once ('legend.php'); ?>
+        <?php if ($is_hr == TRUE) {?>
+            <label class="label " style="background-color: black; color:white" for="chkDayOffHrAll">
+                <input type="checkbox" id="chkDayOffHrAll" class="filterStatus" onclick="Cookies.set('dayOffAll', this.checked); refresh_calendar();" <?php if (isset($_COOKIE['dayOffAll']) && $_COOKIE['dayOffAll'] == 'true') echo 'checked';?>> részmunkaidősek
+            </label>
+        <?php } ?>
     </div>
 </div>
 
@@ -428,6 +433,7 @@
             //console.log(toggleDayoffs);
             includeChildren = $.parseJSON(includeChildren.toLowerCase());
             toggleDayoffs = $.parseJSON(toggleDayoffs.toLowerCase());
+            $('#chkIncludeDaysOffs').prop('checked', toggleDayoffs);
             $('#txtEntity').val(entityName);
             $('#chkIncludeChildren').prop('checked', includeChildren);
             //Load the calendar events
