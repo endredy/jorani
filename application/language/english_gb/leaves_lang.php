@@ -129,3 +129,12 @@ $lang['leaves_comment_new_comment'] = 'New comment';
 $lang['leaves_comment_send_comment'] = 'Send comment';
 $lang['leaves_comment_author_saying'] = ' says';
 $lang['leaves_comment_status_changed'] = 'The status of the leave have been changed to ';
+
+$lang['leaves_home_office_limit'] = "You are exceeding your weekly home office days.\n office days: %s (min: %s)\n home office days: %s (max: %d)\n\nDo you still want to request it?";
+$lang['leaves_hr_home_office_limit'] = "Emloyee exceeds his/her weekly home office days.<br/> office days: %s (min: %s)<br/> home office days: %s (max: %d)";
+$lang['leaves_concurrent_user_overlapped'] = "Somebody has leave(s) in this period, and you can't have leaves at the same time.\n\nDo you still want to request it?";
+$lang['leaves_hr_concurrent_user_overlapped'] = "Emloyee's colleague also has leave(s) in this period, and they can't have leaves at the same time.";
+$lang['leaves_hr_concurrent_employees_title'] = 'Groups';
+$lang['leaves_hr_concurrent_employees_desc'] = 'Groups can be defined, whose members can\'t leave at the same time.';
+$lang['leaves_hr_concurrent_employees_edit'] = 'Edit group';
+$lang['leaves_hr_concurrent_employees_selected'] = 'You\'ve selected: ';

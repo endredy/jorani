@@ -117,6 +117,14 @@ class Leaves extends CI_Controller {
         if (empty($data['leave'])) {
             redirect('notfound');
         }
+        $over = $this->leaves_model->detectHOLimit($data['leave']['employee'], $data['leave']['type'], $data['leave']['startdate'], $data['leave']['enddate'],  $data['leave']['startdatetype'], $data['leave']['enddatetype'], TRUE);
+        if ($over !== FALSE) {
+            $data['homeOfficeLimit'] = sprintf(lang('leaves_hr_home_office_limit'), $over["officeDays"], $over["officeLimit"], $over["homeOfficeDuration"], $over["homeOfficeLimit"]);
+        }
+        if ($this->leaves_model->detectConcurrentUsersLeaves($data['leave']['employee'], $data['leave']['startdate'], $data['leave']['enddate'],  $data['leave']['startdatetype'], $data['leave']['enddatetype'], $id)){
+            $data['concurrentUserOverlapped'] = lang('leaves_hr_concurrent_user_overlapped');
+        }
+
         //If the user is not its not HR, not manager and not the creator of the leave
         //the employee can't see it, redirect to LR list
         if ($data['leave']['employee'] != $this->user_id) {
@@ -488,7 +496,7 @@ class Leaves extends CI_Controller {
         }
         //If the user is not its own manager and if the leave is
         //already requested, the employee can't modify it
-        if (!$this->is_hr) {
+        if (!$this->is_hr && !$this->is_manager) {
             if (($this->session->userdata('manager') != $this->user_id) &&
                     $data['leave']['status'] != LMS_PLANNED) {
                 if ($this->config->item('edit_rejected_requests') == FALSE ||
@@ -541,7 +549,7 @@ class Leaves extends CI_Controller {
             $this->load->view('templates/footer');
         } else {
           //Prevent thugs to auto validate their leave requests
-          if (!$this->is_hr && !$this->is_admin) {
+          if (!$this->is_hr && !$this->is_admin && !$this->is_manager) {
             if ($this->input->post('status') == LMS_ACCEPTED) {
                 log_message('error', 'User #' . $this->session->userdata('id') . 
                     ' tried to submit a LR with an wrong status = ' . $this->input->post('status'));
@@ -1043,9 +1051,11 @@ class Leaves extends CI_Controller {
         $leave_id = intval($this->input->post('leave_id', TRUE));
         $leaveValidator = new stdClass;
         $deductDayOff = FALSE;
+        $typeId = NULL;
         if (isset($id) && isset($type)) {
             $typeObject = $this->types_model->getTypeByName($type);
             $deductDayOff = $typeObject['deduct_days_off'];
+            $typeId = $typeObject['id'];
             if (isset($startdate) && $startdate !== "") {
                 $leaveValidator->credit = $this->leaves_model->getLeavesTypeBalanceForEmployee($id, $type, $startdate);
             } else {
@@ -1058,6 +1068,11 @@ class Leaves extends CI_Controller {
             } else {
                 $leaveValidator->overlap = $this->leaves_model->detectOverlappingLeaves($id, $startdate, $enddate, $startdatetype, $enddatetype);
             }
+        }
+
+        // is there any concurrent users? (who cannot have leaves at the same time)
+        if ($this->leaves_model->detectConcurrentUsersLeaves($id, $startdate, $enddate, $startdatetype, $enddatetype, $leave_id ?? NULL)){
+            $leaveValidator->concurrentUser = lang('leaves_concurrent_user_overlapped');
         }
 
         //Returns end date of the yearly leave period or NULL if the user is not linked to a contract
@@ -1087,6 +1102,18 @@ class Leaves extends CI_Controller {
         //Repeat start and end dates of the leave request
         $leaveValidator->RequestStartDate = $startdate;
         $leaveValidator->RequestEndDate = $enddate;
+
+        // here we can check HO limit ( x days a week only if there are (5-x) office days)
+        if (isset($leaveValidator->limit)) unset($leaveValidator->limit);
+        if (isset($type)){
+
+            // this type of leave has to be checked (also...
+            $over = $this->leaves_model->detectHOLimit($id, $typeId, $startdate, $enddate, $startdatetype, $enddatetype, FALSE);
+            if ($over !== FALSE) {
+                $this->lang->load('leaves', $this->language);
+                $leaveValidator->limit = sprintf(lang('leaves_home_office_limit'), $over["officeDays"], $over["officeLimit"], $over["homeOfficeDuration"], $over["homeOfficeLimit"]);
+            }
+        }
 
         echo json_encode($leaveValidator);
     }

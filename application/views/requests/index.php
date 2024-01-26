@@ -246,8 +246,18 @@ $(document).ready(function() {
      $('#leaves').on('click', '.lnkAccept', function (event) {
         event.preventDefault();
         if (!clicked) {
-            clicked = true;
-            window.location.href = "<?php echo base_url();?>requests/accept/" + $(this).data("id");
+             const lid = $(this).data("id");
+             $.ajax({
+                 url: "<?php echo base_url();?>requests/check/" + lid,
+                 type: "GET",
+             }).done(function(d) {
+                 // console.log(d);
+                 const j = JSON.parse(d);
+                 if (!j.msg || (j.msg && confirm(j.msg))){
+                     clicked = true;
+                     window.location.href = "<?php echo base_url();?>requests/accept/" + lid;
+                 }
+             });
         }
      });
      $("#leaves").on('click', '.lnkReject', function (event) {

@@ -84,7 +84,7 @@ if (isset($_GET['source'])) {
         case LMS_ACCEPTED: $style= "dropdown-accepted"; break;
         default: $style= "dropdown-rejected"; break;
     } ?>
-    <?php if ($is_hr) {?>
+    <?php if ($is_hr || $is_manager) {?>
     <label for="status"><?php echo lang('leaves_edit_field_status');?></label>
     <select name="status" class="<?php echo $style; ?>">
         <option value="1" <?php if ($leave['status'] == LMS_PLANNED) echo 'selected'; ?>><?php echo lang('Planned');?></option>
@@ -108,7 +108,7 @@ if (isset($_GET['source'])) {
     <?php } ?>
     <br />
 
-    <?php if ($is_hr) {?>
+    <?php if ($is_hr || $is_manager) {?>
     <button type="submit" class="btn btn-primary"><i class="mdi mdi-check"></i>&nbsp;<?php echo lang('leaves_edit_button_update');?></button>&nbsp;
     <?php } ?>
 

@@ -624,7 +624,7 @@ class Leaves_model extends CI_Model {
 
     /**
      * Detect if the leave request overlaps with another request of the employee
-     * @param int $id employee id
+     * @param int $id employee id (single id or can be array, too)
      * @param date $startdate start date of leave request being created
      * @param date $enddate end date of leave request being created
      * @param string $startdatetype start date type of leave request being created (Morning or Afternoon)
@@ -635,7 +635,7 @@ class Leaves_model extends CI_Model {
      */
     public function detectOverlappingLeaves($id, $startdate, $enddate, $startdatetype, $enddatetype, $leave_id=NULL) {
         $overlapping = FALSE;
-        $this->db->where('employee', $id);
+        $this->db->where_in('employee', is_array($id) ? $id : [$id]); // where_in() instead of where() by esteve
         $this->db->where('status NOT IN ( 4, 5, 6)'); // rejected or cancellation or cancelled can't overlap
         $this->db->where('(startdate <= DATE(\'' . $enddate . '\') AND enddate >= DATE(\'' . $startdate . '\'))');
         if (!is_null($leave_id)) {
@@ -670,6 +670,125 @@ class Leaves_model extends CI_Model {
             }
         }
         return $overlapping;
+    }
+
+    /**
+     * Groups (pairs) can be defined, who cannot have leaves at the same time.
+     * This function checks, if there is any and they have leavbes in the given interval.
+     *
+     */
+    public function detectConcurrentUsersLeaves($id, $startdate, $enddate, $startdatetype, $enddatetype, $leave_id=NULL){
+
+//        SELECT x2.* FROM concurrent_user_xref x1 left join concurrent_user_xref x2 ON x1.groupid=x2.groupid and x1.userid!=x2.userid WHERE x1.userid=12;
+        $this->db->select('x2.userid');
+        $this->db->from('concurrent_user_xref x1');
+        $this->db->join('concurrent_user_xref x2', 'x1.groupid=x2.groupid and x1.userid!=x2.userid');
+        $this->db->where('x1.userid', $id);
+        $results = $this->db->get()->result_array();
+        $concurrentUserIds = array();
+        foreach ($results as $row) {
+            array_push($concurrentUserIds, $row['userid']);
+        }
+//        var_dump($concurrentUserIds);
+        if ($concurrentUserIds)
+            return $this->detectOverlappingLeaves($concurrentUserIds, $startdate, $enddate, $startdatetype, $enddatetype, $leave_id);
+    }
+
+    /**
+    Home office may have weekly limit: only n days can be requested every week, if there is enough office days.
+     * This func checks it.
+     */
+    public function detectHOLimit($id, $type, $startdate, $enddate,  $startdatetype, $enddatetype, $isHr) {
+
+        $this->load->model('users_model');
+        $user = $this->users_model->getUsers($id);
+
+        $HO_limit = 5; // max
+        if (isset($user['home_office_limit']) && $user['home_office_limit'] != '')
+            $HO_limit = $user['home_office_limit'];
+
+//        echo "bind_marker: " . $this->db->bind_marker . "|";
+        // ez a select 2 leave type id-t hasznal beegetve: home office: 9, kulso helyszin: 11
+        $home_office_leavetype_id = 9;
+        $external_location_leavetype_id = 11;
+        $sql = "select lk.employee
+      ,lk.datum
+      ,lk.week_start, lk.week_end
+      , 7 - lk.leaves_duration - count(distinct doff.id) as office_days
+      , COALESCE(ho_duration,0) as ho_duration
+from (
+    select employee, datum, week_start, week_end
+          ,sum(leaves_duration) as leaves_duration
+          ,sum(case when type = ? then leaves_duration end) as ho_duration -- ho type id
+    from (
+        select k.employee, k.datum, k.week_start, k.week_end
+              ,l.id, l.type
+              ,TIMESTAMPDIFF(hour, greatest(l.startdate, k.week_start), least(l.enddate, k.week_end) )/24 - count(distinct leavDo.id) as leaves_duration
+        from (
+            select employee, datum
+            ,DATE_SUB(datum, INTERVAL WEEKDAY(datum) DAY) as week_start
+            ,datum + interval(6 - WEEKDAY(datum)) day as week_end
+            from (
+               select date(?) as datum, ? as employee 
+            ) b
+        ) k
+        left join (
+			select id, employee, type
+					,cast(startdate as datetime) + INTERVAL (case startdatetype when 'Morning' THEN 0 else 12 end) hour as startdate
+					,cast(enddate as datetime) + INTERVAL (case enddatetype when 'Morning' THEN 12 else 24 end) hour as enddate
+			from (
+                select id, employee, type,startdate,enddate,startdatetype,enddatetype, status
+                from leaves
+                
+                ". (!$isHr ? "union all select -1, ?, ?, ?, ?, ?, ?, 1" : "") . //  the current request (which is requesting and which is not in the db)
+                ") z
+            where type != ? -- external loc type id
+              and status not in (4,5,6)
+		) l on l.employee = k.employee
+                      -- akkor van átfedés a vizsgált hét és a szabi között ha:
+                        -- a szabi a hét vége előtt kezdődik, és a hét eleje után végződik
+                      and l.startdate <= k.week_end
+                      and l.enddate >= k.week_start
+        left join users u on u.id = l.employee
+		left join dayoffs leavDo on leavDo.contract = u.contract and leavDo.date between greatest(l.startdate, k.week_start) and least(l.enddate, k.week_end)
+        group by k.employee, k.datum, k.week_end, k. week_start, l.id, l.type
+                ,greatest(l.startdate, k.week_start), least(l.enddate, k.week_end)
+    ) b2
+    group by employee, datum, week_start, week_end
+
+) lk
+left join users u on u.id = lk.employee
+left join dayoffs doff on doff.contract = u.contract and doff.date between week_start and week_end
+group by lk.employee, lk.datum, lk.week_start, lk.week_end, lk.leaves_duration;";
+        $params = [$home_office_leavetype_id, $startdate, $id, $external_location_leavetype_id];
+        if (!$isHr)
+            array_splice($params, -1, 0, [$id, $type, $startdate, $enddate, $startdatetype, $enddatetype]);
+//        var_dump($params);
+        $q = $this->db->query( $sql, $params);
+        $res = $q->result_array();
+//        var_dump($res);
+
+        // serul a HO limit:
+        //  ha ho-t igenyel, es nincs meg a heten a 3 irodai nap
+        //  ha sima szabit igenyel, es van a heten HO-ja, aminel nem fog teljesulni a heti 3 irodai nap
+        $ho_duration = round($res[0]['ho_duration']);
+        $office_days = round($res[0]['office_days']);
+        if ($ho_duration > 0 && $office_days > 0){
+//            $l = $res[0]['ho_duration'] > 0 ? $HO_limit : 0;
+            $a = (5-$HO_limit) - $office_days;
+            if ($a > 0) {
+                return ["homeOfficeLimit" => $HO_limit, "officeLimit" => 5-$HO_limit, "officeDays" => $office_days, "homeOfficeDuration" => $ho_duration];
+            }
+        }
+
+//'employee' '11',
+//'datum' '2024-01-17',
+//'week_start' '2024-01-15',
+//'week_end' '2024-01-21',
+//'office_days' '3.5000',
+//'ho_duration' '0.5000'
+
+        return FALSE;
     }
 
     /**

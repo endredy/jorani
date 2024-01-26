@@ -539,4 +539,72 @@ class Hr extends CI_Controller {
         $data['id'] = $id;
         $this->load->view('hr/export_presence', $data);
     }
+
+    // group feature: pairs can be defined who cannot have leaves at the same time (esteve)
+    public function groups(){
+        $this->auth->checkIfOperationIsAllowed('list_employees');
+        $data = getUserContext($this);
+
+        $this->db->select('x.groupid, u.id, u.lastname, u.firstname');
+        $this->db->from('concurrent_user_xref x');
+        $this->db->join('users u', 'x.userid=u.id');
+        $this->db->order_by('groupid');
+        $results = $this->db->get()->result_array();
+
+        $groups = []; $curr = []; $lastGroupId = 0;
+        foreach ($results as $row) {
+            if ($lastGroupId != $row['groupid'] && $curr){
+                array_push($groups, $curr);
+                $curr = [];
+            }
+            array_push($curr, $row);
+            $lastGroupId = $row['groupid'];
+        }
+        if ($curr) array_push($groups, $curr);
+        $data['groups'] = $groups;
+
+//        var_dump($this->db->get_compiled_select());
+
+        $this->lang->load('leaves', $this->language);
+        $data['title'] = lang('leaves_hr_concurrent_employees_title');
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('menu/index', $data);
+        $this->load->view('hr/groups', $data);
+        $this->load->view('templates/footer');
+    }
+
+    public function editGroups($op, $groupId = NULL){
+
+        header("Content-Type: application/json");
+        if ($this->auth->isAllowed('list_employees') == FALSE) {
+            $this->output->set_header("HTTP/1.1 403 Forbidden");
+        } else {
+
+            // against sql injection (convert inputs into int)
+            $ids = $this->input->get('ids', TRUE);
+            $groupId = intval($groupId);
+            if (is_array($ids))
+                $ids = array_map('intval', $ids);
+
+            if ($op === 'del'){
+
+                $this->db->query( "DELETE FROM concurrent_user_xref WHERE groupid IN (?)", [$groupId]);
+
+            }else if ($op === 'new'){
+
+                $this->db->query( "INSERT INTO concurrent_user_xref (groupid, userid) 
+                (SELECT max(x.groupid)+1, u.id FROM concurrent_user_xref x, users u WHERE u.id IN (".implode(',', $ids).") GROUP BY u.id)");
+
+            }else if ($op === 'edit'){
+
+                $this->db->query( "DELETE FROM concurrent_user_xref WHERE groupid IN (?)", [$groupId]);
+                foreach ($ids as $id){
+                    $this->db->query( "INSERT INTO concurrent_user_xref (groupid, userid) VALUES(?, ?)", [$groupId, $id]);
+                }
+            }
+            echo '{"done": "' . $op . '"}';
+        }
+    }
+
 }

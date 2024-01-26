@@ -146,6 +146,14 @@ function validate_form() {
         return false;
     }
 
+    if (validatedInfo.limit !== undefined && validatedInfo.limit){
+        return confirm(validatedInfo.limit);
+    }
+
+    if (validatedInfo.concurrentUser !== undefined && validatedInfo.concurrentUser){
+        return confirm(validatedInfo.concurrentUser);
+    }
+
     if (apprException.indexOf($('#type option:selected').val()) != -1 && validatedInfo.length > validatedInfo.credit){
         bootbox.alert("<?php echo lang('leaves_create_field_duration_message');?>");
         return false;

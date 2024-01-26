@@ -86,7 +86,10 @@ function getLeaveInfos(preventDefault) {
                 }
                 if (leaveInfo.credit != null) {
                     $("#lblCredit").text('(' + leaveInfo.credit + ')');
+                }else{
+                    $("#lblCredit").text('');
                 }
+                validatedInfo = leaveInfo;
             }
             //Check if the current request overlaps with another one
             showOverlappingMessage(leaveInfo);

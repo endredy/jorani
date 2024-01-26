@@ -61,6 +61,31 @@ class Requests extends CI_Controller {
         $this->load->view('templates/footer');
     }
 
+
+    // check HO rules and is there any leaves in this interval from employee who cannot have leaves at the same time (esteve)
+    public function check($id) {
+
+        $this->auth->checkIfOperationIsAllowed('accept_requests');
+        $this->load->model('users_model');
+        $this->load->model('delegations_model');
+        $leave = $this->leaves_model->getLeaves($id);
+        if (empty($leave)) {
+            echo '{"msg": "not found"}';
+            return;
+        }
+        $msg = '';
+        $over = $this->leaves_model->detectHOLimit($leave['employee'], $leave['type'], $leave['startdate'], $leave['enddate'], $leave['startdatetype'], $leave['enddatetype'], TRUE);
+        if ($over !== FALSE) {
+            $this->lang->load('leaves', $this->language);
+            $msg = str_replace("<br/>", "\\n", sprintf(lang('leaves_hr_home_office_limit'), $over["officeDays"], $over["officeLimit"], $over["homeOfficeDuration"], $over["homeOfficeLimit"]));
+        }
+        if ($this->leaves_model->detectConcurrentUsersLeaves($leave['employee'], $leave['startdate'], $leave['enddate'], $leave['startdatetype'], $leave['enddatetype'], $id)){
+            $this->lang->load('leaves', $this->language);
+            $msg .= "\\n" . lang('leaves_hr_concurrent_user_overlapped');
+        }
+        echo '{"msg": "' . $msg . '"}';
+    }
+
     /**
      * Accept a leave request
      * @param int $id leave request identifier

@@ -62,12 +62,15 @@ switch ($leave['status']) {
       <br/><br/>
     <?php } ?>
 
-    <?php if (($leave['status'] == LMS_PLANNED) || ($is_hr)) { ?>
+    <?php if (isset($homeOfficeLimit)) echo '<div class="alert alert-danger" role="alert">' . $homeOfficeLimit . '</div>'; ?>
+    <?php if (isset($concurrentUserOverlapped)) echo '<div class="alert alert-danger" role="alert">' . $concurrentUserOverlapped . '</div>'; ?>
+
+    <?php if (($leave['status'] == LMS_PLANNED) || $is_hr || $is_manager) { ?>
     <a href="<?php echo base_url();?>leaves/edit/<?php echo $leave['id'] ?>" class="btn btn-primary"><i class="mdi mdi-pencil"></i>&nbsp;<?php echo lang('leaves_view_button_edit');?></a>
     &nbsp;
     <?php } ?>
-    <?php if (($leave['status'] == LMS_REQUESTED) && ($is_hr)) { ?>
-        <a href="<?php echo base_url();?>requests/accept/<?php echo $leave['id'] ?>" class="btn btn-primary"><i class="mdi mdi-check"></i>&nbsp;<?php echo lang('requests_index_thead_tip_accept');?></a>&nbsp;
+    <?php if (($leave['status'] == LMS_REQUESTED) && ($is_hr || $is_manager)) { ?>
+        <a href="<?php echo base_url();?>requests/accept/<?php echo $leave['id'] ?>" class="btn btn-primary" <?php if (isset($homeOfficeLimit)) echo "onclick=\"return confirm('".str_replace("<br/>", "\\n", $homeOfficeLimit)."');\"";?>><i class="mdi mdi-check"></i>&nbsp;<?php echo lang('requests_index_thead_tip_accept');?></a>&nbsp;
     <?php } ?>
     <a href="<?php echo base_url() . $source; ?>" class="btn btn-primary"><i class="mdi mdi-arrow-left-bold"></i>&nbsp;<?php echo lang('leaves_view_button_back_list');?></a>
 
