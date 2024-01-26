@@ -149,7 +149,7 @@ Ha nincs tartalom, nem küld emailt.
             }
             .allrequested{
                 background: right no-repeat url("<?=base_url()?>assets/images/requested.png");
-                background-color: rgba(0, 0, 0, 0);
+                /*background-color: rgba(0, 0, 0, 0);*/
                 padding-right: 10px;
                 background-origin: content-box;
             }
