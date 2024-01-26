@@ -148,7 +148,9 @@ Ha nincs tartalom, nem küld emailt.
                 width: 300px !important;
             }
             .allrequested{
-                background: right no-repeat url("<?=base_url()?>assets/images/requested.png");
+                background-image: url("<?=base_url()?>assets/images/requested.png");
+                background-repeat: no-repeat;
+                background-position: right;
                 /*background-color: rgba(0, 0, 0, 0);*/
                 padding-right: 10px;
                 background-origin: content-box;
@@ -177,7 +179,7 @@ Ha nincs tartalom, nem küld emailt.
             }
 
             .table {
-                width:100%;
+                /*width:100%;*/
                 margin-bottom:20px
             }
             .table {
