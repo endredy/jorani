@@ -399,6 +399,38 @@ class Users_model extends CI_Model {
         return $result;
     }
 
+    // save user's email report settings only, nothing else (esteve)
+    public function updateUsersProps($id) {
+
+        $fullData = $this->users_model->getUsers($id);
+        if (empty($fullData)) {
+            return;
+        }
+
+        // we modify ONLY user_properties (no other field):
+        $data = ['user_properties' => $fullData['user_properties']];
+        $properties = json_decode($data['user_properties'], true);
+
+        $v = $this->input->post('del');
+        if ($v != NULL && $v == '1'){
+            // users wants to delete his/her email report settings
+            unset($properties['report']);
+        }else {
+            if ($this->input->post('email_report_freq') != NULL && $this->input->post('email_report_freq') != '') {
+                if (!isset($properties['report'])) $properties['report'] = [];
+                $properties['report']['frequency'] = $this->input->post('email_report_freq');
+            }
+            if ($this->input->post('email_report_level') != NULL && $this->input->post('email_report_level') != '') { // esteve
+                if (!isset($properties['report'])) $properties['report'] = [];
+                $properties['report']['entity'] = $this->input->post('email_report_level');
+            }
+        }
+
+        $data['user_properties'] = json_encode($properties);
+        $this->db->where('id', $id);
+        $this->db->update('users', $data);
+    }
+
     /**
      * Update a given user in the database. Update data are coming from an HTML form
      * @return int number of affected rows

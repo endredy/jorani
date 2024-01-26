@@ -77,6 +77,12 @@
                 <?php } ?>
             </div>
         </div>
+
+        <div class="row-fluid">
+            <div class="span6"><strong><?php echo lang('users_email_report');?></strong></div>
+            <div class="span6"><a href="#" onclick="$('#frmSelectEmailReport').modal('show');"><?=$email_report_label?></a>
+            </div>
+        </div>
     </div>
     <div class="span6">
         <h2>Apps</h2>
@@ -114,6 +120,65 @@
     </div>
 </div>
 
+<div id="frmSelectEntity" class="modal hide fade" style="z-index:1051">
+    <div class="modal-header">
+        <a href="#" onclick="$('#frmSelectEntity').modal('hide');" class="close">&times;</a>
+        <h3><?php echo lang('calendar_organization_popup_entity_title');?></h3>
+    </div>
+    <div class="modal-body" id="frmSelectEntityBody">
+        <img src="<?php echo base_url();?>assets/images/loading.gif">
+    </div>
+    <div class="modal-footer">
+        <a href="#" onclick="select_entity();" class="btn btn-primary"><?php echo lang('calendar_organization_popup_entity_button_ok');?></a>
+        <a href="#" onclick="$('#frmSelectEntity').modal('hide');" class="btn"><?php echo lang('calendar_organization_popup_entity_button_cancel');?></a>
+    </div>
+</div>
+
+
+
+<?php echo form_open('users/editLimited/' . $user['id'], ['id' => 'reportForm']); ?>
+<div id="frmSelectEmailReport" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" onclick="$('#frmSelectEmailReport').modal('hide');" class="close">&times;</a>
+        <h3><?php echo lang('users_email_report');?></h3>
+    </div>
+    <div class="modal-body">
+
+
+        <div class="row-fluid">
+            <div class="span2"><?php echo lang('users_email_report_level')?></div>
+            <div class="">
+                <div class="input-prepend input-append">
+                    <span class="add-on" id="spnAddOn"><i class="mdi mdi-sitemap"></i></span>
+                    <input type="text" id="txtEntity" name="email_report_levelname" value="<?=$email_report_level_label?>" readonly />
+                    <input type="hidden" id="email_report_level" name="email_report_level" value="<?=$email_report_level?>" readonly />
+                    <button id="cmdSelectEntity" class="btn btn-primary" title="<?php echo lang('calendar_organization_button_select_entity');?>"><i class="mdi mdi-sitemap" aria-hidden="true"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row-fluid">
+            <div class="span2"><?php echo lang('users_email_report_frequency');?></div>
+            <div class=""><select name="email_report_freq" id="freq">
+                    <option value="weekly" <?=$email_report_freq !== 'daily' ? 'selected' : ''?>><?php echo lang('users_email_report_weekly');?></option>
+                    <option value="daily" <?=$email_report_freq === 'daily' ? 'selected' : ''?>><?php echo lang('users_email_report_daily');?></option>
+                </select>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <input type="hidden" id="del" name="del" value="0"/>
+        <button type="submit" onclick="$('#del').val(1); return true;" class="btn btn-danger pull-left"><?php echo lang('extra_index_thead_tip_delete');?></button>
+        <button type="submit" class="btn btn-primary"><?php echo lang('users_edit_popup_position_button_ok');?></button>
+        <a href="#" onclick="$('#frmSelectEmailReport').modal('hide');" class="btn"><?php echo lang('users_edit_popup_position_button_cancel');?></a>
+    </div>
+</div>
+</form>
+
+
+
 <script type="text/javascript">
 $(function() {
     //Copy/Paste ICS Feed
@@ -133,5 +198,27 @@ $(function() {
       Cookies.set('language', value, { expires: 90, path: '/'});
       window.location.href = '<?php echo base_url();?>session/language?language=' + value;
     });
+
+
+    //Popup select entity
+    $("#cmdSelectEntity").click(function() {
+        $("#frmSelectEntity").modal('show');
+        $("#frmSelectEntityBody").load('<?php echo base_url(); ?>organization/select');
+        return false; // not to submit
+    });
+    //Popup select list
+    $("#cmdSelectList").click(function() {
+        $("#frmSelectList").modal('show');
+        $("#frmSelectListBody").load('<?php echo base_url(); ?>organization/lists');
+    });
 });
+
+function select_entity() {
+    const entity = $('#organization').jstree('get_selected')[0];
+    const entityName = $('#organization').jstree().get_text(entity);
+    $('#spnAddOn').html('<i class="mdi mdi-sitemap" aria-hidden="true"></i>');
+    $('#txtEntity').val(entityName);
+    $('#email_report_level').val(entity);
+    $("#frmSelectEntity").modal('hide');
+}
 </script>

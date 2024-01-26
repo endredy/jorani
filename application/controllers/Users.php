@@ -128,6 +128,22 @@ class Users extends CI_Controller {
         $data['contract_label'] = $this->contracts_model->getName($data['user']['contract']);
         $data['position_label'] = $this->positions_model->getName($data['user']['position']);
         $data['organization_label'] = $this->organization_model->getName($data['user']['organization']);
+        // settings of email report feature (esteve)
+        $data['email_report_label'] = '-';
+        $data['email_report_level'] = '';
+        $data['email_report_level_label'] = '';
+        $data['email_report_freq'] = '';
+        $this->load->helper('form');
+        $this->lang->load('calendar', $data['language']);
+        $this->lang->load('extra_lang', $data['language']);
+        $props = json_decode( $data['user']['user_properties']);
+        if ($props !== NULL && isset($props->report)){
+            $level = $this->organization_model->getName( $props->report->entity);
+            $data['email_report_level_label'] = $level;
+            $data['email_report_freq'] = $props->report->frequency;
+            $data['email_report_level'] = $props->report->entity;
+            $data['email_report_label'] = 'gyakoriság: ' . ($props->report->frequency === 'weekly' ? 'heti' : 'napi') . ', szint: ' . $level;
+        }
         $data['apps'] = $this->oauthclients_model->listOAuthApps($this->user_id);
         $this->load->view('templates/header', $data);
         $this->load->view('menu/index', $data);
@@ -194,6 +210,12 @@ class Users extends CI_Controller {
         }
     }
 
+    // save user's email report settings only, nothing else (esteve)
+    public function editLimited($id){
+        $this->auth->checkIfOperationIsAllowed('change_password', $id);
+        $this->users_model->updateUsersProps($id);
+        redirect('users/myprofile');
+    }
     /**
      * Reset the password of a user
      * Can be accessed by the user itself or by admin
