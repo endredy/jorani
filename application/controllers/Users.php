@@ -136,7 +136,7 @@ class Users extends CI_Controller {
         $this->load->helper('form');
         $this->lang->load('calendar', $data['language']);
         $this->lang->load('extra_lang', $data['language']);
-        $props = json_decode( $data['user']['user_properties']);
+        $props = isset($data['user']['user_properties']) ? json_decode( $data['user']['user_properties']) : NULL;
         if ($props !== NULL && isset($props->report)){
             $level = $this->organization_model->getName( $props->report->entity);
             $data['email_report_level_label'] = $level;
