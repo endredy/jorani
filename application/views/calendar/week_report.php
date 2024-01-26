@@ -110,14 +110,14 @@ Ha nincs tartalom, nem küld emailt.
 
         $dateH = new DateTime($start);
 //        $date = clone $dateH;
-//        setlocale(LC_TIME, "de_DE");
-        $formatter = new IntlDateFormatter(
-            "hu_HU",
-            IntlDateFormatter::FULL,
-            IntlDateFormatter::FULL,
-            'Europe/Budapest'
-        );
-        $formatter->setPattern('Y.MM.dd. EEEE');
+//        setlocale(LC_TIME, "hu_HU");
+//        $formatter = new IntlDateFormatter(
+//            "hu_HU",
+//            IntlDateFormatter::FULL,
+//            IntlDateFormatter::FULL,
+//            'Europe/Budapest'
+//        );
+//        $formatter->setPattern('Y.MM.dd. EEEE');
 
         $max = $week ? 7 : 1;
         // <?=$week  ? '' : 'oneday'
@@ -203,7 +203,7 @@ Ha nincs tartalom, nem küld emailt.
                 <?php for ($i = 1; $i <= $max; $i++) {
                     $day = $dateH->format("Ymd");
                     if (isset($daily[$day])) {
-                        echo ' <tr><td class="header">' . $formatter->format($dateH) . '</td></tr>';
+                        echo ' <tr><td class="header">' . /*$formatter->format($dateH)*/$dateH->format('Y. M. d.') . '</td></tr>';
                         echo ' <tr><td>';
                         foreach($daily[$day] as $e){
                             echo $this->printLeave($e);
