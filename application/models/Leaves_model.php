@@ -752,7 +752,7 @@ from (
         left join users u on u.id = l.employee
 		left join dayoffs leavDo on leavDo.contract = u.contract and leavDo.date between greatest(l.startdate, k.week_start) and least(l.enddate, k.week_end)
         group by k.employee, k.datum, k.week_end, k. week_start, l.id, l.type
-                ,greatest(l.startdate, k.week_start), least(l.enddate, k.week_end)
+                ,greatest(l.startdate, k.week_start), least(l.enddate, k.week_end), l.startdate, l.enddate
     ) b2
     group by employee, datum, week_start, week_end
 
