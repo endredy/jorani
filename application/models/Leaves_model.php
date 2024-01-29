@@ -1020,7 +1020,8 @@ group by lk.employee, lk.datum, lk.week_start, lk.week_end, lk.leaves_duration;"
         if (isset($json_parsed)){
           array_push($json_parsed->comments, $commentObject);
         }else {
-          if ($json_parsed) $json_parsed->comments = array($commentObject);
+            $json_parsed = new stdClass;
+            $json_parsed->comments = array($commentObject);
         }
         $comment_change = new stdClass;
         $comment_change->type = "change";
@@ -1029,7 +1030,7 @@ group by lk.employee, lk.datum, lk.week_start, lk.week_end, lk.leaves_duration;"
         if (isset($json_parsed)){
           array_push($json_parsed->comments, $comment_change);
         }else {
-            if ($json_parsed) $json_parsed->comments = array($comment_change);
+            $json_parsed->comments = array($comment_change); // never reach (dead code), $json_parsed is defined, worse case in line 1023
         }
         $json = json_encode($json_parsed ?? '');
         $data = array(

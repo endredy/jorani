@@ -111,7 +111,7 @@ class MY_Email extends CI_Email {
 
     public function __destruct() {
 
-        if (is_callable('parent::__destruct')) {
+        if (is_callable('parent', '__destruct')) {  // PHP 8.2 suggestion: if (is_callable([parent::class, '__destruct'])) {
             parent::__destruct();
         }
     }
