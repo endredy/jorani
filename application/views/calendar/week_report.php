@@ -4,12 +4,12 @@ class CronTest extends CI_Controller {
 
     /*
      *
-összefoglalva:
-a user két dolgot állíthat be: a cég melyik szintjétől kezdve küldje + heti (ez hétfő 8-kor) vagy napi (minden hétköznap 8-kor)
+summary:
+user has 2 settings: which level of the organization will be in the report + weekly (on Monday at 8:00) or daily (each workday at 8:00)
 
-a report csak munkanapokat mutatja, és ott is csak azt, ahol van tartalom (szabi, ho, stb)
+The report shows only workdays, and even where is content (any types of leaves)
 
-Ha nincs tartalom, nem küld emailt.
+If there is no content, no email will be sent.
      * */
     function report(){
 
@@ -59,8 +59,19 @@ Ha nincs tartalom, nem küld emailt.
     }
 
 
+    // email html css must be inline (otherwise some email clients may render it badly)
     function printLeave($leave){
-        return '<div class="'.$leave['type'].' leave '.$leave['class'].'" style="background-color: '.$leave['color'].'; color: '.$leave['textColor'].'">'.$leave['name'] . '</div>';
+        $requestedStyle = "background-image: url('". base_url() . "assets/images/requested.png'); background-repeat: no-repeat; background-position: right; padding-right: 10px; background-origin: content-box;";
+        $am = "width: 50%;";
+        $pm = "width: 50%; float: right;";
+        $style = "padding: 2px 5px;"; // common
+        if ($leave['type'] == 'am')
+            $style .= $am;
+        else if ($leave['type'] == 'pm')
+            $style .= $pm;
+        if ($leave['class'] == 'allrequested')
+            $style .= $requestedStyle;
+        return '<tr><td><div style="' . $style . 'background-color: '.$leave['color'].'; color: '.$leave['textColor'].'">'.$leave['name'] . '</div></td></tr>';
     }
 
     public function getHtml($entity_id = 0, $week = true){
@@ -76,7 +87,7 @@ Ha nincs tartalom, nem küld emailt.
             $e = new DateTime($l->end);
 
             $interval = $e->diff($s);
-            $days = $interval->format('%a');
+            $days = (int)$interval->format('%a') + 1; // 8h = 1 working day
 
             $type = 'full';
             if ($l->startdatetype == 'Morning' && $l->enddatetype == 'Morning')
@@ -90,7 +101,7 @@ Ha nincs tartalom, nem küld emailt.
 
             if ($days <= 1) continue; /// 1 day leave
 
-            for($i=0; $i<$days-1; $i++){
+            for($i=0; $i<$days-2; $i++){ // start and end day are added outside of for
                 $s->add($oneDay);
                 $day = $s->format("Ymd");
                 $this->addLeave2Day($daily, $l, $day, 'full');
@@ -126,91 +137,16 @@ Ha nincs tartalom, nem küld emailt.
 //        var_dump($leaveObj);
 ?>
 
-        <style>
-            .leave{
-                padding: 2px 5px;
-                margin: 1px;
-            }
-            .full{
-            }
-            .am{
-                width: 50%;
-            }
-            .pm{
-                width: 50%;
-                float: right;
-            }
-
-            .header{
-                background-color: lightgrey;
-            }
-            .oneday{
-                width: 300px !important;
-            }
-            .allrequested{
-                background-image: url("<?=base_url()?>assets/images/requested.png");
-                background-repeat: no-repeat;
-                background-position: right;
-                /*background-color: rgba(0, 0, 0, 0);*/
-                padding-right: 10px;
-                background-origin: content-box;
-            }
-
-            .table-bordered {
-                border:1px solid #ddd;
-                border-collapse:separate;
-                *border-collapse:collapse;
-                border-left:0;
-                -webkit-border-radius:4px;
-                -moz-border-radius:4px;
-                border-radius:4px
-            }
-            .table-bordered th,
-            .table-bordered td {
-                border-left:1px solid #ddd
-            }
-            .table th,
-            .table td {
-                padding:8px;
-                line-height:20px;
-                text-align:left;
-                vertical-align:top;
-                border-top:1px solid #ddd
-            }
-
-            .table {
-                /*width:100%;*/
-                margin-bottom:20px
-            }
-            .table {
-                max-width:100%;
-                background-color:transparent;
-                border-collapse:collapse;
-                border-spacing:0
-            }
-
-            /*body {*/
-            /*    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;*/
-            /*    font-size: 14px;*/
-            /*    line-height: 20px;*/
-            /*    color: #333;*/
-            /*}*/
-
-        </style>
-
-
-        <table class="table table-bordered table-condensed oneday">
+        <table style="width: 350px !important; border-spacing:1px;">
 
 
                 <?php for ($i = 1; $i <= $max; $i++) {
                     $day = $dateH->format("Ymd");
                     if (isset($daily[$day])) {
-                        echo ' <tr><td class="header">' . /*$formatter->format($dateH)*/$dateH->format('Y. M. d.') . '</td></tr>';
-                        echo ' <tr><td>';
+                        echo ' <tr><td style="background-color: lightgrey; color: black; padding: 5px; font-size: 14pt;">' . /*$formatter->format($dateH)*/$dateH->format('Y. M. d.') . '</td></tr>';
                         foreach($daily[$day] as $e){
                             echo $this->printLeave($e);
                         }
-                        echo '</td> </tr>';
                     }
                     $dateH->add($oneDay);
                 }?>
