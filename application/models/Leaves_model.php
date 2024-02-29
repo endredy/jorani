@@ -714,7 +714,7 @@ class Leaves_model extends CI_Model {
         $sql = "select lk.employee
       ,lk.datum
       ,lk.week_start, lk.week_end
-      , 7 - lk.leaves_duration - count(distinct doff.id) as office_days
+      , 7 - COALESCE(lk.leaves_duration,0) - count(distinct doff.id) as office_days
       , COALESCE(ho_duration,0) as ho_duration
 from (
     select employee, datum, week_start, week_end
